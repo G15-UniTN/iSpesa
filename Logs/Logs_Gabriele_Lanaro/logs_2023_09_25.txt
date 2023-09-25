@@ -1,0 +1,4 @@
+11:30-13:30
+- Inizializzato l'organizzazione su GitHub
+- Idealizzazione del progetto e gli obiettivi
+- Stesura del documento di analisi dei requisiti
