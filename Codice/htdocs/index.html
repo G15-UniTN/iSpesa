@@ -21,7 +21,7 @@
         }
 
         .carousel-item img{
-          max-height:500px;
+          max-height:350px;
         }
 
         .font-2{
@@ -31,13 +31,36 @@
         .font-3{
           color:black;
         }
+
+        .font-sconto{
+          color:red;
+          text-decoration: line-through;
+          text-align: center;
+        }
+
+        .font-prezzo_nuovo{
+          color: black;
+          text-align: center;
+        }
+
+        .font-nome_prodotto{
+          overflow: hidden;
+          display: -webkit-box;
+          -webkit-line-clamp: 2; /* number of lines to show */
+                  line-clamp: 2; 
+          -webkit-box-orient: vertical;
+          text-align: center;
+        }
+
+        .ritratti-ombra{
+          box-shadow: 5px 5px 10px;
+        }
     </style>
 </head>
   <body>
     <header class="p-3 bg-dark">
       <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-          <a href="./index.html" class="d-flex align-items-center mb-2">
-              Logo
+          <a href="./index.html" class="d-flex align-items-center mb-2 mb-lg-0 "><img class="bi me-2" style="max-width: 40px;" src="../img/sito/logo.png">
           </a>
           <ul class="nav col-12 col-lg-auto me-lg-auto justify-content-center mb-2 mb-md-0 mr-auto">
               <li>
@@ -136,50 +159,76 @@
         </div>
       </div>
     </nav>
-    <div class="container py-3">
-      <div class="row">
-        <div class="col-3 p-3">
-          <div class="container  bg-secondary-subtle rounded-2 shadow">
-            <div class="container p-3">
-              <img src="../img/ritratti/speck.jpg" class="mw-100 mh-100 rounded-4" alt="...">
-            </div>
-            <div class="container font-3">
-              <h2 style="text-align:center;">Speck</h2>
-              <p style="text-align:center;" class="mb-1">€10/kg</p>
-            </div>
+    <div class="row">
+      <div class="col-2 p-3">
+        <div class="container bg-secondary-subtle rounded-2 ritratti-ombra">
+          <div class="container p-3">
+            <img src="../img/ritratti/speck.jpg" class="mw-100 mh-100 rounded-4" alt="...">
+          </div>
+          <div class="container font-3">
+            <h3 class="font-nome_prodotto">Speck da Colosimo e famiglia</h3>
+            <p class="font-sconto mb-0">€15/kg</p>
+            <h3 class="font-prezzo_nuovo mb-1">€10/kg</h3>
           </div>
         </div>
-        <div class="col-3 p-3">
-          <div class="container  bg-secondary-subtle rounded-2 shadow">
-            <div class="container p-3">
-              <img src="../img/ritratti/speck.jpg" class="mw-100 mh-100 rounded-4" alt="...">
-            </div>
-            <div class="container font-3">
-              <h2 style="text-align:center;">Speck</h2>
-              <p style="text-align:center;" class="mb-1">€10/kg</p>
-            </div>
+      </div>
+      <div class="col-2 p-3">
+        <div class="container  bg-secondary-subtle rounded-2 ritratti-ombra">
+          <div class="container p-3">
+            <img src="../img/ritratti/canederli.jpg" class="mw-100 mh-100 rounded-4" alt="...">
+          </div>
+          <div class="container font-3">
+            <h3 class="font-nome_prodotto">Canederli dal Garda</h3>
+            <p class="font-sconto mb-0">€10/kg</p>
+            <h3 class="font-prezzo_nuovo mb-1">€8/kg</h3>
           </div>
         </div>
-        <div class="col-3 p-3">
-          <div class="container  bg-secondary-subtle rounded-2 shadow">
-            <div class="container p-3">
-              <img src="../img/ritratti/speck.jpg" class="mw-100 mh-100 rounded-4" alt="...">
-            </div>
-            <div class="container font-3">
-              <h2 style="text-align:center;">Speck</h2>
-              <p style="text-align:center;" class="mb-1">€10/kg</p>
-            </div>
+      </div>
+      <div class="col-2 p-3">
+        <div class="container  bg-secondary-subtle rounded-2 ritratti-ombra">
+          <div class="container p-3">
+            <img src="../img/ritratti/pretzel.jpg" class="mw-100 mh-100 rounded-4" alt="...">
+          </div>
+          <div class="container font-3">
+            <h3 class="font-nome_prodotto">Pretzel da Belghiti & Co</h3>
+            <p class="font-sconto mb-0">€10/kg</p>
+            <h3 class="font-prezzo_nuovo mb-1">€8/kg</h3>
           </div>
         </div>
-        <div class="col-3 p-3">
-          <div class="container  bg-secondary-subtle rounded-2 shadow">
-            <div class="container p-3">
-              <img src="../img/ritratti/speck.jpg" class="mw-100 mh-100 rounded-4" alt="...">
-            </div>
-            <div class="container font-3">
-              <h2 style="text-align:center;">Speck</h2>
-              <p style="text-align:center;" class="mb-1">€10/kg</p>
-            </div>
+      </div>
+      <div class="col-2 p-3">
+        <div class="container  bg-secondary-subtle rounded-2 ritratti-ombra">
+          <div class="container p-3">
+            <img src="../img/ritratti/strudel.jpg" class="mw-100 mh-100 rounded-4" alt="...">
+          </div>
+          <div class="container font-3">
+            <h3 class="font-nome_prodotto">Strudel da Lanaro & Leonardi</h3>
+            <p class="font-sconto mb-0">€20/kg</p>
+            <h3 class="font-prezzo_nuovo mb-1">€16/kg</h3>
+          </div>
+        </div>
+      </div>
+      <div class="col-2 p-3">
+        <div class="container  bg-secondary-subtle rounded-2 ritratti-ombra">
+          <div class="container p-3">
+            <img src="../img/ritratti/spatzel.jpg" class="mw-100 mh-100 rounded-4" alt="...">
+          </div>
+          <div class="container font-3">
+            <h3 class="font-nome_prodotto">Spatzel Trentini Certificati</h3>
+            <p class="font-sconto mb-0">€12/kg</p>
+            <h3 class="font-prezzo_nuovo mb-1">€10/kg</h3>
+          </div>
+        </div>
+      </div>
+      <div class="col-2 p-3">
+        <div class="container  bg-secondary-subtle rounded-2 ritratti-ombra">
+          <div class="container p-3">
+            <img src="../img/ritratti/tortel.jpg" class="mw-100 mh-100 rounded-4" alt="...">
+          </div>
+          <div class="container font-3">
+            <h3 class="font-nome_prodotto">Tortel della Val di Non</h3>
+            <p class="font-sconto mb-0">€18/kg</p>
+            <h3 class="font-prezzo_nuovo mb-1">€16/kg</h3>
           </div>
         </div>
       </div>
