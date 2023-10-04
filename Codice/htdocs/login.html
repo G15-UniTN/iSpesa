@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap demo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <style>
+        .font-1{
+            color: whitesmoke;
+        }
+
+        a{
+            text-decoration: none;
+            display: inline-block;
+            text-shadow: 1px 1px 2px rgba(0,0,0, 0.25);
+
+        }
+
+        ul.nav a:hover{
+            color:goldenrod;
+        }
+
+        .carousel-item img{
+          max-height:350px;
+        }
+
+        .font-2{
+          text-shadow: 0px 0px 6px black;
+        }
+
+        .font-3{
+          color:black;
+        }
+
+        .font-sconto{
+          color:red;
+          text-decoration: line-through;
+          text-align: center;
+        }
+
+        .font-prezzo_nuovo{
+          color: black;
+          text-align: center;
+        }
+
+        .font-nome_prodotto{
+          color: black;
+          overflow: hidden;
+          display: -webkit-box;
+          -webkit-line-clamp: 2; /* number of lines to show */
+                  line-clamp: 2; 
+          -webkit-box-orient: vertical;
+          text-align: center;
+        }
+
+        .ritratti-ombra{
+          box-shadow: 5px 5px 10px;
+        }
+    </style>
+</head>
+  <body>
+    <header class="p-3 bg-dark">
+      <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+          <a href="./index.html" class="d-flex align-items-center mb-2 mb-lg-0 "><img class="bi me-2" style="max-width: 40px;" src="../img/sito/logo.png">
+          </a>
+          <ul class="nav col-12 col-lg-auto me-lg-auto justify-content-center mb-2 mb-md-0 mr-auto">
+              <li>
+                  <a href="./sconti.html" class="nav-link px-2 font-1">Sconti</a>
+              </li>
+              <li>
+                  <a href="./volantini.html" class="nav-link px-2 font-1">Volantini</a>
+              </li>
+              <li>
+                  <a href="./negozi_migliori.html" class="nav-link px-2 font-1">Negozi Migliori</a>
+              </li>
+              <li>
+                  <a href="./preferiti.html" class="nav-link px-2 font-1">Preferiti</a>
+              </li>
+          </ul>
+          <ul class="nav col-12 col-lg-auto justify-content-center mb-2 mb-md-0">
+              <li>
+                  <a href="./login.html" class="nav-link px-4 font-1">Login</a>
+              </li>
+              <li>
+                  <div class="dropdown">
+                      <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="navbarNavDarkDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        Lingua
+                      </a>
+                    
+                      <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                        <li><a class="dropdown-item" href="#">Italiano</a></li>
+                        <li><a class="dropdown-item" href="#">English</a></li>
+                      </ul>
+                    </div>
+              </li>
+          </ul>
+      </div>
+    </header>
+    <div class="d-flex justify-content-center py-5">
+        <div class="container col-3 bg-dark-subtle shadow p-3 rounded-4">
+            <div class="container">
+                <form action="./area_riservata.php">
+                    <div class="col-11 d-flex justify-content-center align-items-center">
+                        <h1>Log-in</h1>
+                    </div>
+                    <div class="form-group py-3">
+                        <label for="user">Username o E-Mail</label>
+                        <input type="text" class="form-control" id="user" placeholder="Inserisci qua">
+                    </div>
+                    <div class="form-group pb-3">
+                        <label for="password">Password</label>
+                        <input type="text" class="form-control" id="password" placeholder="Inserisci qua">
+                        <small id="emailHelp" class="form-text text-muted"><a href="./forgot.html">Password dimenticata?</a></small>
+                    </div>
+                    <div class="d-flex justify-content-around" style="margin:auto">
+                        <button type="submit" class="btn btn-primary">Invia</button>                
+                        <div class="col d-flex justify-content-center align-items-center">
+                            <a href="./sign.html">Non hai un account? Registrati</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+  </body>
+</html>
