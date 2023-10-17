@@ -1,0 +1,2 @@
+Orario di lavoro:10.00/11.30
+Analisi dei requisiti funzionali e non funzionali del nostro progetto
