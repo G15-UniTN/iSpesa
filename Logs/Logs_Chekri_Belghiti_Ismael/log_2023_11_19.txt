@@ -1,0 +1,2 @@
+Orario di lavoro:15:00-18:00
+-Ho ricontrollato il diagramma dei componenti e corretto una serie di errori trovati precedentemente

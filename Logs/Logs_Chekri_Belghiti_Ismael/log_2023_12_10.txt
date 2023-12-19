@@ -1,0 +1,2 @@
+Orario di lavoro: 18:00-20:00
+Creazione diagramma E/R del database iSpesa e di un database fittizio per testare la nostra Web-app

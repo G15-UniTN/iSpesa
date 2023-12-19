@@ -1,0 +1,3 @@
+Orario di lavoro:18:00/19:30
+Dopo aver discusso con i miei compagni abbiamo deciso di modificare alcuni aspetti della WEB-App.
+Quindi ho prontamente modificato il Database in base alle esigenze riscontrate
