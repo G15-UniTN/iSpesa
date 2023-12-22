@@ -9,7 +9,6 @@ const session = require("express-session");
 app.use(express.static(path.join(__dirname, "public")));
 app.set("view engine", "hbs");
 app.set("views", path.join(__dirname, "views"));
-app.set("auth", path.join(__dirname, "views/auth"));
 hbs.registerPartials(__dirname + "/views/partials");
 
 const port = 8080;
@@ -61,6 +60,16 @@ app.get("/login", (req, res) => {
 
 app.get("/signup", (req, res) => {
     res.render('signup.hbs');
+})
+
+
+app.get("/prodotto", (req, res) => {
+    if(req.query.IDProdotto == null){
+        res.send("Errore: nessun prodotto selezionato");
+    }
+    else{
+        res.render("prodotto.hbs");
+    }
 })
 
 app.post("/checkLogin", (req, res) => {
@@ -144,11 +153,31 @@ app.get("/api/eliminaSconto", (req, res) => {
 })
 
 app.get("/api/trovaTuttiSconti", (req, res) => {
-    
+    sql = "SELECT * FROM sconto";
+    con.query(sql, function(err, results){
+        if(err){
+            console.log(err);
+            res.send("Error");
+            return;
+        };
+        res.json(results);
+        return;
+    });
 })
 
 app.get("/api/trovaScontiFiltroNegozio", (req, res) => {
-    
+    var negozio = req.query.NegozioDoveValido;
+    console.log(negozio);
+    sql = "SELECT * FROM sconto WHERE NegozioDoveValido = '" + negozio + "'";
+    con.query(sql, function(err, results){
+        if(err){
+            console.log(err);
+            res.send("Error");
+            return;
+        };
+        res.json(results);
+        return;
+    });
 })
 
 app.get("/api/trovaScontiFiltroCategoria", (req, res) => {
@@ -194,7 +223,16 @@ app.get("/api/aggiungiVolantino", (req, res) => {
 })
 
 app.get("/api/trovaTuttiNegozi", (req, res) => {
-    
+    sql = "SELECT * FROM negozio";
+    con.query(sql, function(err, results){
+        if(err){
+            console.log(err);
+            res.send("Error");
+            return;
+        };
+        res.json(results);
+        return;
+    });
 })
 
 app.get("/api/trovaTuttiNegoziFiltroNome", (req, res) => {
@@ -228,11 +266,62 @@ app.get("/api/aggiungiPrezzo", (req, res) => {
 })
 
 app.get("/api/trovaTuttiProdotti", (req, res) => {
-    
+    var sql = "SELECT p.Nome, p.Immagine, p.Categoria, p.IDProdotto, P.NegozioProvenienza, s2.Prezzo FROM prodotto p, storicoprezzi s2 WHERE p.IDProdotto = s2.Prodotto GROUP BY p.IDProdotto HAVING MAX(s2.Data)"
+    con.query(sql, function(err, results){
+        if(err){
+            console.log(err);
+            res.send("Error");
+            return;
+        };
+        res.json(results);
+        return;
+    })
+})
+
+app.get("/api/trovaTuttiProdottiScontati", (req, res) => {
+    var sql = "SELECT p.Nome, p.Immagine, p.Categoria, p.IDProdotto, P.NegozioProvenienza, s.Valore AS Sconto, s2.Prezzo FROM prodotto p, validita_sconto_prodotto v, sconto s, storicoprezzi s2  WHERE p.IDProdotto = v.prodotto AND v.Sconto = s.IDSconto AND p.IDProdotto = s2.Prodotto  GROUP BY p.IDProdotto  HAVING MAX(s2.Data) UNION SELECT p.Nome, p.Immagine, p.Categoria, p.IDProdotto, P.NegozioProvenienza, s.Valore AS Sconto, s2.Prezzo  FROM prodotto p, validita_sconto_categoria v, sconto s, storicoprezzi s2  WHERE v.Categoria = p.Categoria AND s.IDSconto = v.Sconto AND p.NegozioProvenienza = s.NegozioDoveValido AND p.IDProdotto = s2.Prodotto  GROUP BY p.IDProdotto  HAVING MAX(s2.Data)"
+    con.query(sql, function(err, results){
+        if(err){
+            console.log(err);
+            res.send("Error");
+            return;
+        };
+        res.json(results);
+        return;
+    })
+})
+
+app.get("/api/trovaTuttiProdottiScontatiFiltroCategoria", (req, res) => {
+    var Categoria = req.query.Categoria;
+    console.log(req.body);
+    var sql = "SELECT p.Nome, p.Immagine, p.Categoria, p.IDProdotto, P.NegozioProvenienza, s.Valore AS Sconto, s2.Prezzo FROM prodotto p, validita_sconto_prodotto v, sconto s, storicoprezzi s2  WHERE p.IDProdotto = v.prodotto AND v.Sconto = s.IDSconto AND p.IDProdotto = s2.Prodotto AND p.Categoria = '" + Categoria + "' GROUP BY p.IDProdotto  HAVING MAX(s2.Data) UNION SELECT p.Nome, p.Immagine, p.Categoria, p.IDProdotto, P.NegozioProvenienza, s.Valore AS Sconto, s2.Prezzo  FROM prodotto p, validita_sconto_categoria v, sconto s, storicoprezzi s2  WHERE v.Categoria = p.Categoria AND s.IDSconto = v.Sconto AND p.NegozioProvenienza = s.NegozioDoveValido AND p.IDProdotto = s2.Prodotto AND p.Categoria = '" + Categoria + "' GROUP BY p.IDProdotto  HAVING MAX(s2.Data)"
+    con.query(sql, function(err, results){
+        if(err){
+            console.log(err);
+            res.send("Error");
+            return;
+        };
+        res.json(results);
+        return;
+    })
 })
 
 app.get("/api/trovaProdottiFiltroNome", (req, res) => {
-    
+
+})
+
+app.get("/api/trovaProdottoFiltroID", (req, res) => {
+    var IDProdotto = req.query.IDProdotto;
+    var sql = "SELECT p.Nome, p.Immagine, p.Categoria, p.IDProdotto, P.NegozioProvenienza, s2.Prezzo FROM prodotto p, storicoprezzi s2 WHERE p.IDProdotto = s2.Prodotto AND p.IDProdotto ='" + IDProdotto + "' GROUP BY p.IDProdotto HAVING MAX(s2.Data)";
+    con.query(sql, function(err, results){
+        if(err){
+            console.log(err);
+            res.send("Error");
+            return;
+        };
+        res.json(results);
+        return;
+    })
 })
 
 app.get("/api/trovaProdottiFiltroNegozio", (req, res) => {
@@ -240,7 +329,17 @@ app.get("/api/trovaProdottiFiltroNegozio", (req, res) => {
 })
 
 app.get("/api/trovaProdottiFiltroCategoria", (req, res) => {
-    
+    var Categoria = req.query.Categoria;
+    var sql = "SELECT p.Nome, p.Immagine, p.Categoria, p.IDProdotto, P.NegozioProvenienza, s2.Prezzo FROM prodotto p, storicoprezzi s2 WHERE p.IDProdotto = s2.Prodotto AND p.Categoria = '" + Categoria + "' GROUP BY p.IDProdotto HAVING MAX(s2.Data)"
+    con.query(sql, function(err, results){
+        if(err){
+            console.log(err);
+            res.send("Error");
+            return;
+        };
+        res.json(results);
+        return;
+    })
 })
 
 app.get("/api/trovaProdottiFiltroPreferiti", (req, res) => {
@@ -376,6 +475,11 @@ app.get("/api/inviaMail", (req, res) => {
 app.get("/api/categorie", (req, res) => {
     sql = "SELECT * FROM categoria";
     con.query(sql, function(err, results){
+        if(err){
+            console.log(err);
+            res.send("Error");
+            return;
+        };
         res.json(results);
         return;
     });

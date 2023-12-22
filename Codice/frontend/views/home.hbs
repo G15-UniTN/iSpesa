@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>iSpesa</title>
+    <link href="/css/slideshow.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <style>
         .font-1{
@@ -65,97 +66,94 @@
           -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
         }
+
+        .nav-link-categorie{
+          height:100%;
+        }
     </style>
 </head>
   <body onload="caricaDati()">{{>header}}
-    <div id="carouselExampleCaptions" class="carousel slide" data-bs-ride="carousel">
-      <div class="carousel-indicators">
-        <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-        <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="1" aria-label="Slide 2"></button>
-        <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="2" aria-label="Slide 3"></button>
-      </div>
-      <div class="carousel-inner">
-        <div class="carousel-item active">
-          <img src="/img/speck.jpg" class="d-block w-100" alt="...">
-          <div class="carousel-caption d-none d-md-block">
-            <h2 class="font-2">Speck</h2>
-            <h5 class="font-2">Costo €7/kg</h5>
-          </div>
-        </div>
-        <div class="carousel-item">
-          <img src="/img/formaggio.jpg" class="d-block w-100" alt="...">
-          <div class="carousel-caption d-none d-md-block">
-            <h2 class="font-2">Formaggio</h2>
-            <h5 class="font-2">Costo €10/kg</h5>
-          </div>
-        </div>
-        <div class="carousel-item">
-          <img src="/img/salame.jpg" class="d-block w-100" alt="...">
-          <div class="carousel-caption d-none d-md-block">
-            <h2 class="font-2">Salame</h2>
-            <h5 class="font-2">Costo €20/kg</h5>
-          </div>
-        </div>
-      </div>
-      <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Previous</span>
-      </button>
-      <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Next</span>
-      </button>
+    <!-- Slideshow container -->
+    <div class="slideshow-container" id="slideshowProdotti">
     </div>
     <nav class="navbar navbar-expand-lg navbar-light bg-dark-subtle">
       <div class="container-fluid">
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav nav-tabs me-auto px-2" id="navbar-categorie">
-            <li class="nav-item px-2">
-              <a class="nav-link active">Tutti</a>
+            <li class="nav-item px-2" onclick="caricaProdotti();isActive('Tutti')" style="cursor: pointer">
+              <a class="nav-link active nav-link-categorie" id="Tutti">Tutti</a>
             </li>
           </ul>
           <div class="d-flex">
-            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+            <input class="form-control me-2" type="search" placeholder="Search" onsbumit="cercaProdotti()" aria-label="Search">
           </div>
         </div>
       </div>
     </nav>
     <div class="container p-0">
-      <div class="row">
-        <div class="col-2 p-3">
-            <div class="card bg-secondary-subtle shadow">
-                <container class="p-3">
-                    <img src="/img/ritratti/speck.jpg" class="card-img-top mw-100 mh-100 rounded-4" alt="Logo del prodotto">
-                </container>
-                <div class="card-body pt-0 pb-1">
-                    <h3 class="font-nome_prodotto">Tortel della Val di Non</h3>
-                    <p class="font-sconto mb-0">€18/kg</p>
-                    <h3 class="font-prezzo_nuovo mb-1">€16/kg</h3>
-                    <p class="card-text"><small class="text-muted">Scade il *data*</small></p>
-                </div>
-            </div>
-        </div>
+      <div class="row" id="listaProdotti">
       </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
     <script>
         const url_sito = "http://localhost:8080";
-        function sendProdotto(){
-            var idProdotto;
-            var form;
-            form = document.createElement("form");
-            form.action = "/prodotto";
-            form.method = "post";
-            idProdotto.type = "hidden";
-            idProdotto.name = "id";
-            idProdotto.value = "placeholder";
-            form.appendChild(idProdotto);
-            form.submit();
-        }
 
         function caricaDati(){
           caricaCategorie();
           caricaProdotti();
+          caricaSlideshow();
+        }
+
+        function caricaSlideshow(){
+          document.getElementById("listaProdotti").innerHTML = "";
+          fetch(url_sito + "/api/trovaTuttiProdottiScontati")
+          .then(response => response.json())
+          .then(data => {
+            var i = 0;
+            while(i < 3 && i < data.length){
+              var Nome = data[i].Nome;
+              var Immagine = data[i].Immagine;
+              var Categoria = data[i].Categoria;
+              var IDProdotto = data[i].IDProdotto;
+              var NegozioProvenienza = data[i].NegozioProvenienza;
+              var Sconto = data[i].Sconto;
+              var Prezzo = data[i].Prezzo;
+              let c1 = document.createElement("div");
+              c1.classList.add("mySlides", "fade");
+              let c2 = document.createElement("div");
+              c2.classList.add("numbertext");
+              c2.innerHTML = (i+1) + "/3";
+              let c3 = document.createElement("img");
+              c3.classList.add("d-block", "w-100");
+              c3.style.maxHeight = "300px"
+              c3.src = "https://images.nationalgeographic.org/image/upload/t_edhub_resource_key_image/v1638882850/EducationHub/photos/yellow-river.jpg";
+              let c4 = document.createElement("div");
+              c4.classList.add("d-none", "d-md-block");
+              let c5 = document.createElement("h2");
+              c5.classList.add("text");
+              c5.innerHTML = Nome + "<br>" + "Costo €" + ((Prezzo) - (Prezzo/100*Sconto)) + "/kg";;
+              let c6 = document.createElement("h5");
+              
+              c1.appendChild(c2);
+              c1.appendChild(c3);
+              c1.appendChild(c4);
+              c4.appendChild(c5);
+              c4.appendChild(c6);
+              document.getElementById("slideshowProdotti").appendChild(c1);
+              i++;
+            }
+            let c7 = document.createElement("a");
+            c7.classList.add("prev");
+            c7.setAttribute("onclick", "plusSlides(-1)");
+            c7.innerHTML = "<";
+            let c8 = document.createElement("a");
+            c8.classList.add("next");
+            c8.setAttribute("onclick", "plusSlides(1)");
+            c8.innerHTML = ">";
+            document.getElementById("slideshowProdotti").appendChild(c7);
+            document.getElementById("slideshowProdotti").appendChild(c8);
+            showSlides(-1);
+          })
         }
 
         function caricaCategorie(){
@@ -163,15 +161,19 @@
             .then(response => response.json())
             .then(data => {
               data.forEach(row => {
-                console.log(row);
                 categoria = row.Categoria;
-                var funzione = "mostraCategoria(" + categoria + ")";
-                let li = document.createElement("li");
+                var funzione = "mostraCategoria('" + categoria + "')";
+                var funzione2 = "isActive('" + categoria + "')";
+                var funzioni = funzione + ";" + funzione2;
+                var li = document.createElement("li");
                 let a = document.createElement("a");
                 li.classList.add("nav-item");
                 li.classList.add("px-2");
+                li.setAttribute('style', "cursor: pointer");
                 a.classList.add("nav-link");
-                a.onclick = funzione;
+                a.classList.add("nav-link-categorie");
+                a.id = categoria;
+                li.setAttribute('onclick', funzioni);
                 a.innerHTML = categoria.replaceAll("_", " ");
                 li.appendChild(a);
                 document.getElementById("navbar-categorie").appendChild(li);
@@ -179,8 +181,250 @@
             })
         }
 
-        function mostraCategoria(categoria){
+        function caricaProdotti(){
+          var prodotti_scontati_trovati = [];
+          document.getElementById("listaProdotti").innerHTML = "";
+          fetch(url_sito + "/api/trovaTuttiProdottiScontati")
+          .then(response => response.json())
+          .then(data => {
+            var i = 0;
+            while(i < 18 && i < data.length){
+              var Nome = data[i].Nome;
+              var Immagine = data[i].Immagine;
+              var Categoria = data[i].Categoria;
+              var IDProdotto = data[i].IDProdotto;
+              var NegozioProvenienza = data[i].NegozioProvenienza;
+              var Sconto = data[i].Sconto;
+              var Prezzo = data[i].Prezzo;
+              prodotti_scontati_trovati.push(IDProdotto);
+              let c1 = document.createElement("div");
+              c1.classList.add("col-2", "p-3");
+              var funzione_pagina_prodotto = "paginaProdotto('" + IDProdotto + "')";
+              c1.setAttribute("onclick", funzione_pagina_prodotto);
+              c1.style.cursor = "pointer";
+              let c2 = document.createElement("div");
+              c2.classList.add("card", "bg-secondary-subtle", "shadow");
+              let c3 = document.createElement("div");
+              c3.classList.add("container", "p-3");
+              let c4 = document.createElement("img");
+              c4.classList.add("card-img-top", "mw-100", "mh-100", "rounded-4");
+              c4.src = "https://lh3.googleusercontent.com/u/0/drive-viewer/AEYmBYTm7ZG98XCNFKmX-on_fPcqI2L4ElEtAylsYLWh2YRTtUOOoB4TSAdzkHgzxFyA3un9n4RzIpAie2xNfD5-eaeMsQJMWw=w1879-h939";
+              let c5 = document.createElement("div");
+              c5.classList.add("card-body", "pt-0", "pb-1");
+              let c6 = document.createElement("h3");
+              c6.classList.add("font-nome_prodotto");
+              c6.innerHTML = Nome.replaceAll("_", " ");
+              let c7 = document.createElement("p");
+              c7.classList.add("font-sconto", "mb-0");
+              c7.innerHTML = "€" + Prezzo + "/kg";
+              let c8 = document.createElement("h3");
+              c8.classList.add("font-prezzo_nuovo", "mb-1");
+              var Prezzo_scontato = Prezzo - (Prezzo/100*Sconto);
+              c8.innerHTML = "€" + Prezzo_scontato + "/kg";
+              i++;
+              c1.appendChild(c2);
+              c2.appendChild(c3);
+              c3.appendChild(c4);
+              c2.appendChild(c5);
+              c5.appendChild(c6);
+              c5.appendChild(c7);
+              c5.appendChild(c8);
+              document.getElementById("listaProdotti").appendChild(c1);
+            }
+            if(i < 20){
+              fetch(url_sito + "/api/trovaTuttiProdotti")
+              .then(response => response.json())
+              .then(data => {
+                while(i < 18 && i < data.length){
+                  var Nome = data[i].Nome;
+                  var Immagine = data[i].Immagine;
+                  var Categoria = data[i].Categoria;
+                  var IDProdotto = data[i].IDProdotto;
+                  var NegozioProvenienza = data[i].NegozioProvenienza;
+                  var Sconto = data[i].Sconto;
+                  var Prezzo = data[i].Prezzo;
+                  prodotti_scontati_trovati.push(IDProdotto);
+                  let c1 = document.createElement("div");
+                  c1.classList.add("col-2", "p-3");
+                  let c2 = document.createElement("div");
+                  c2.classList.add("card", "bg-secondary-subtle", "shadow");
+                  let c3 = document.createElement("div");
+                  c3.classList.add("container", "p-3");
+                  let c4 = document.createElement("img");
+                  c4.classList.add("card-img-top", "mw-100", "mh-100", "rounded-4");
+                  c4.src = "https://lh3.googleusercontent.com/u/0/drive-viewer/AEYmBYTm7ZG98XCNFKmX-on_fPcqI2L4ElEtAylsYLWh2YRTtUOOoB4TSAdzkHgzxFyA3un9n4RzIpAie2xNfD5-eaeMsQJMWw=w1879-h939";
+                  let c5 = document.createElement("div");
+                  c5.classList.add("card-body", "pt-0", "pb-1");
+                  let c6 = document.createElement("h3");
+                  c6.classList.add("font-nome_prodotto");
+                  c6.innerHTML = Nome.replaceAll("_", " ");
+                  let c7 = document.createElement("p");
+                  c7.classList.add("font-sconto", "mb-0");
+                  c7.innerHTML = " ";
+                  let c8 = document.createElement("h3");
+                  c8.classList.add("font-prezzo_nuovo", "mb-1");
+                  c8.innerHTML = "€" + Prezzo + "/kg";
+                  i++;
+                  c1.appendChild(c2);
+                  c2.appendChild(c3);
+                  c3.appendChild(c4);
+                  c2.appendChild(c5);
+                  c5.appendChild(c6);
+                  c5.appendChild(c7);
+                  c5.appendChild(c8);
+                  document.getElementById("listaProdotti").appendChild(c1);
+                }
+              })
+            }
+          })
+        }
 
+        function mostraCategoria(categoria){
+          const request_scontati = "/api/trovaTuttiProdottiScontatiFiltroCategoria?Categoria=" + categoria;
+          const request = "/api/trovaProdottiFiltroCategoria?Categoria=" + categoria;
+          
+          document.getElementById("listaProdotti").innerHTML = "";
+          var prodotti_scontati_trovati = [];
+          fetch((url_sito + request_scontati))
+          .then(response => response.json())
+          .then(data => {
+            var i = 0;
+            while(i < 18 && i < data.length){
+              var Nome = data[i].Nome;
+              var Immagine = data[i].Immagine;
+              var Categoria = data[i].Categoria;
+              var IDProdotto = data[i].IDProdotto;
+              var NegozioProvenienza = data[i].NegozioProvenienza;
+              var Sconto = data[i].Sconto;
+              var Prezzo = data[i].Prezzo;
+              prodotti_scontati_trovati.push(IDProdotto);
+              let c1 = document.createElement("div");
+              c1.classList.add("col-2", "p-3");
+              var funzione_pagina_prodotto = "paginaProdotto('" + IDProdotto + "')";
+              c1.setAttribute("onclick", funzione_pagina_prodotto);
+              c1.style.cursor = "pointer";
+              let c2 = document.createElement("div");
+              c2.classList.add("card", "bg-secondary-subtle", "shadow");
+              let c3 = document.createElement("div");
+              c3.classList.add("container", "p-3");
+              let c4 = document.createElement("img");
+              c4.classList.add("card-img-top", "mw-100", "mh-100", "rounded-4");
+              c4.src = "https://lh3.googleusercontent.com/u/0/drive-viewer/AEYmBYTm7ZG98XCNFKmX-on_fPcqI2L4ElEtAylsYLWh2YRTtUOOoB4TSAdzkHgzxFyA3un9n4RzIpAie2xNfD5-eaeMsQJMWw=w1879-h939";
+              let c5 = document.createElement("div");
+              c5.classList.add("card-body", "pt-0", "pb-1");
+              let c6 = document.createElement("h3");
+              c6.classList.add("font-nome_prodotto");
+              c6.innerHTML = Nome.replaceAll("_", " ");
+              let c7 = document.createElement("p");
+              c7.classList.add("font-sconto", "mb-0");
+              c7.innerHTML = "€" + Prezzo + "/kg";
+              let c8 = document.createElement("h3");
+              c8.classList.add("font-prezzo_nuovo", "mb-1");
+              var Prezzo_scontato = Prezzo - (Prezzo/100*Sconto);
+              c8.innerHTML = "€" + Prezzo_scontato + "/kg";
+              i++;
+              c1.appendChild(c2);
+              c2.appendChild(c3);
+              c3.appendChild(c4);
+              c2.appendChild(c5);
+              c5.appendChild(c6);
+              c5.appendChild(c7);
+              c5.appendChild(c8);
+              document.getElementById("listaProdotti").appendChild(c1);
+            }
+            if(i < 20){
+              fetch(url_sito + request)
+              .then(response => response.json())
+              .then(data => {
+                while(i < 18 && i < data.length && !prodotti_scontati_trovati.includes(data[i].IDProdotto)){
+                  var Nome = data[i].Nome;
+                  var Immagine = data[i].Immagine;
+                  var Categoria = data[i].Categoria;
+                  var IDProdotto = data[i].IDProdotto;
+                  var NegozioProvenienza = data[i].NegozioProvenienza;
+                  var Prezzo = data[i].Prezzo;
+                  prodotti_scontati_trovati.push(IDProdotto);
+                  let c1 = document.createElement("div");
+                  c1.classList.add("col-2", "p-3");
+                  let c2 = document.createElement("div");
+                  c2.classList.add("card", "bg-secondary-subtle", "shadow");
+                  let c3 = document.createElement("div");
+                  c3.classList.add("container", "p-3");
+                  let c4 = document.createElement("img");
+                  c4.classList.add("card-img-top", "mw-100", "mh-100", "rounded-4");
+                  c4.src = "https://lh3.googleusercontent.com/u/0/drive-viewer/AEYmBYTm7ZG98XCNFKmX-on_fPcqI2L4ElEtAylsYLWh2YRTtUOOoB4TSAdzkHgzxFyA3un9n4RzIpAie2xNfD5-eaeMsQJMWw=w1879-h939";
+                  let c5 = document.createElement("div");
+                  c5.classList.add("card-body", "pt-0", "pb-1");
+                  let c6 = document.createElement("h3");
+                  c6.classList.add("font-nome_prodotto");
+                  c6.innerHTML = Nome.replaceAll("_", " ");
+                  let c7 = document.createElement("p");
+                  c7.classList.add("font-sconto", "mb-0");
+                  c7.innerHTML = " ";
+                  let c8 = document.createElement("h3");
+                  c8.classList.add("font-prezzo_nuovo", "mb-1");
+                  c8.innerHTML = "€" + Prezzo + "/kg";
+                  i++;
+                  c1.appendChild(c2);
+                  c2.appendChild(c3);
+                  c3.appendChild(c4);
+                  c2.appendChild(c5);
+                  c5.appendChild(c6);
+                  c5.appendChild(c7);
+                  c5.appendChild(c8);
+                  document.getElementById("listaProdotti").appendChild(c1);
+                }
+              })
+            }
+          })
+        }
+
+        function cercaProdotti(){
+
+        }
+
+        function isActive(categoria){
+          let nav_categorie = document.getElementsByClassName("nav-link-categorie");
+          for(var i = 0; i < nav_categorie.length; i++){
+            if(nav_categorie[i].id != categoria){
+              nav_categorie[i].classList.remove("active");
+            }
+            else{
+              nav_categorie[i].classList.add("active");
+            }
+          }
+        }
+
+        // Next/previous controls
+        function plusSlides(n) {
+          showSlides(slideIndex += n);
+        }
+
+        // Thumbnail image controls
+        function currentSlide(n) {
+          showSlides(slideIndex = n);
+        }
+
+        let slideIndex = -1;
+
+        function showSlides(n) {
+          let i;
+          let slides = document.getElementsByClassName("mySlides");
+          let dots = document.getElementsByClassName("dot");
+          if (n > slides.length) {slideIndex = 1}
+          if (n < 1) {slideIndex = slides.length}
+          for (i = 0; i < slides.length; i++) {
+            slides[i].style.display = "none";
+          }
+          for (i = 0; i < dots.length; i++) {
+            dots[i].className = dots[i].className.replace(" active", "");
+          }
+          slides[slideIndex-1].style.display = "block";
+        }
+
+        function paginaProdotto(IDProdotto){
+          const request = "/prodotto?IDProdotto=" + IDProdotto;
+          window.location.replace(request);
         }
     </script>
   </body>
