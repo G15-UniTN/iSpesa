@@ -46,6 +46,20 @@ app.get("/negozi", (req, res) => {
     res.render('negozi.hbs');
 })
 
+app.get("/negozio", (req, res) => {
+    if(req.query.Negozio == null){
+        res.send("Errore: nessun negozio selezionato");
+    }
+    else{
+        if(req.session.user != null){
+            res.render("negozio.hbs", { title: 'user', user: req.session.user});
+        }
+        else{
+            res.render("negozio.hbs");
+        };
+    }
+})
+
 app.get("/sconti", (req, res) => {
     res.render('sconti.hbs');
 })
@@ -68,7 +82,12 @@ app.get("/prodotto", (req, res) => {
         res.send("Errore: nessun prodotto selezionato");
     }
     else{
-        res.render("prodotto.hbs");
+        if(req.session.user != null){
+            res.render("prodotto.hbs", { title: 'user', user: req.session.user});
+        }
+        else{
+            res.render("prodotto.hbs");
+        }
     }
 })
 
@@ -153,7 +172,7 @@ app.get("/api/eliminaSconto", (req, res) => {
 })
 
 app.get("/api/trovaTuttiSconti", (req, res) => {
-    sql = "SELECT * FROM sconto";
+    sql = "SELECT * FROM sconto, negozio WHERE sconto.NegozioDoveValido = negozio.Nome";
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
@@ -168,7 +187,7 @@ app.get("/api/trovaTuttiSconti", (req, res) => {
 app.get("/api/trovaScontiFiltroNegozio", (req, res) => {
     var negozio = req.query.NegozioDoveValido;
     console.log(negozio);
-    sql = "SELECT * FROM sconto WHERE NegozioDoveValido = '" + negozio + "'";
+    sql = "SELECT * FROM sconto, negozio WHERE NegozioDoveValido = '" + negozio + "' AND sconto.NegozioDoveValido = negozio.Nome";
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
@@ -385,11 +404,33 @@ app.get("/api/modificaFotoProfilo", (req, res) => {
 })
 
 app.get("/api/aggiungiProdottoAiPreferiti", (req, res) => {
-    
+    var Username = req.session.user;
+    var IDProdotto = req.query.IDProdotto;
+    var sql = "INSERT INTO prodottipreferiti (Prodotto, Utente) VALUES ('" + IDProdotto + "', '" + Username + "')";
+    con.query(sql, function(err, results){
+        if(err){
+            console.log(err);
+            res.send("Error");
+            return;
+        };
+        res.json(results);
+        return;
+    })
 })
 
 app.get("/api/rimuoviProdottoDaiPreferiti", (req, res) => {
-    
+    var Username = req.session.user;
+    var IDProdotto = req.query.IDProdotto;
+    var sql = "DELETE FROM prodottipreferiti WHERE Prodotto = '" + IDProdotto + "' AND Utente = '" + Username + "'";
+    con.query(sql, function(err, results){
+        if(err){
+            console.log(err);
+            res.send("Error");
+            return;
+        };
+        res.json(results);
+        return;
+    })
 })
 
 app.get("/api/aggiungiNegozioAiPreferiti", (req, res) => {
@@ -418,6 +459,21 @@ app.get("/api/logout", (req, res) => {
 
 app.get("/api/ottieniProdottiPreferiti", (req, res) => {
     
+})
+
+app.get("/api/ottieniProdottiPreferitiFiltroProdotto", (req, res) => {
+    var Username = req.session.user;
+    var Prodotto = req.query.IDProdotto;
+    var sql = "SELECT * FROM prodottipreferiti WHERE Utente = '" + Username + "' AND Prodotto = '" + Prodotto + "'";
+    con.query(sql, function(err, results){
+        if(err){
+            console.log(err);
+            res.send("Error");
+            return;
+        };
+        res.json(results);
+        return;
+    })
 })
 
 app.get("/api/ottieniNegoziPreferiti", (req, res) => {

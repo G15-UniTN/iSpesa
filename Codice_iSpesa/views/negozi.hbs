@@ -68,7 +68,7 @@
         }
     </style>
 </head>
-  <body>{{>header}}
+  <body onload="caricaDati()">{{>header}}
     <nav class="navbar navbar-expand-lg navbar-light bg-dark-subtle">
         <div class="container-fluid">
             <div class="d-flex">
@@ -114,6 +114,7 @@
             var Ubicazione = data[i].Ubicazione;
             var Orari = data[i].Orari;
             var Nome = data[i].Nome;
+            var Logo = data[i].logo; // da cambiare in .Logo
             let c1 = document.createElement("div");
             c1.classList.add("col-2", "p-3");
             let c2 = document.createElement("div");
@@ -122,7 +123,7 @@
             c3.classList.add("container", "p-3");
             let c4 = document.createElement("img");
             c4.classList.add("card-img-top", "p-3");
-            c4.src = "https://lh3.googleusercontent.com/u/0/drive-viewer/AEYmBYTm7ZG98XCNFKmX-on_fPcqI2L4ElEtAylsYLWh2YRTtUOOoB4TSAdzkHgzxFyA3un9n4RzIpAie2xNfD5-eaeMsQJMWw=w1879-h939";
+            c4.src = Logo;
             let c5 = document.createElement("div");
             c5.classList.add("card-body");
             let c6 = document.createElement("h5");
