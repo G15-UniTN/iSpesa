@@ -120,18 +120,21 @@
               var Prezzo = data[i].Prezzo;
               let c1 = document.createElement("div");
               c1.classList.add("mySlides", "fade");
+              var funzione = "paginaProdotto('" + IDProdotto + "')"
+              c1.setAttribute("onclick", funzione)
               let c2 = document.createElement("div");
               c2.classList.add("numbertext");
               c2.innerHTML = (i+1) + "/3";
               let c3 = document.createElement("img");
               c3.classList.add("d-block", "w-100");
               c3.style.maxHeight = "300px"
-              c3.src = "https://images.nationalgeographic.org/image/upload/t_edhub_resource_key_image/v1638882850/EducationHub/photos/yellow-river.jpg";
+              c3.style.objectFit = "cover";
+              c3.src = Immagine;
               let c4 = document.createElement("div");
               c4.classList.add("d-none", "d-md-block");
               let c5 = document.createElement("h2");
               c5.classList.add("text");
-              c5.innerHTML = Nome + "<br>" + "Costo €" + ((Prezzo) - (Prezzo/100*Sconto)) + "/kg";;
+              c5.innerHTML = Nome.replaceAll("_", " ") + "<br>" + "Costo €" + ((Prezzo) - (Prezzo/100*Sconto)) + "/kg";;
               let c6 = document.createElement("h5");
               
               c1.appendChild(c2);
@@ -208,7 +211,7 @@
               c3.classList.add("container", "p-3");
               let c4 = document.createElement("img");
               c4.classList.add("card-img-top", "mw-100", "mh-100", "rounded-4");
-              c4.src = "https://lh3.googleusercontent.com/u/0/drive-viewer/AEYmBYTm7ZG98XCNFKmX-on_fPcqI2L4ElEtAylsYLWh2YRTtUOOoB4TSAdzkHgzxFyA3un9n4RzIpAie2xNfD5-eaeMsQJMWw=w1879-h939";
+              c4.src = Immagine;
               let c5 = document.createElement("div");
               c5.classList.add("card-body", "pt-0", "pb-1");
               let c6 = document.createElement("h3");
@@ -246,13 +249,16 @@
                   prodotti_scontati_trovati.push(IDProdotto);
                   let c1 = document.createElement("div");
                   c1.classList.add("col-2", "p-3");
+                  var funzione_pagina_prodotto = "paginaProdotto('" + IDProdotto + "')";
+                  c1.setAttribute("onclick", funzione_pagina_prodotto);
+                  c1.style.cursor = "pointer";
                   let c2 = document.createElement("div");
                   c2.classList.add("card", "bg-secondary-subtle", "shadow");
                   let c3 = document.createElement("div");
                   c3.classList.add("container", "p-3");
                   let c4 = document.createElement("img");
                   c4.classList.add("card-img-top", "mw-100", "mh-100", "rounded-4");
-                  c4.src = "https://lh3.googleusercontent.com/u/0/drive-viewer/AEYmBYTm7ZG98XCNFKmX-on_fPcqI2L4ElEtAylsYLWh2YRTtUOOoB4TSAdzkHgzxFyA3un9n4RzIpAie2xNfD5-eaeMsQJMWw=w1879-h939";
+                  c4.src = Immagine;
                   let c5 = document.createElement("div");
                   c5.classList.add("card-body", "pt-0", "pb-1");
                   let c6 = document.createElement("h3");
@@ -309,7 +315,7 @@
               c3.classList.add("container", "p-3");
               let c4 = document.createElement("img");
               c4.classList.add("card-img-top", "mw-100", "mh-100", "rounded-4");
-              c4.src = "https://lh3.googleusercontent.com/u/0/drive-viewer/AEYmBYTm7ZG98XCNFKmX-on_fPcqI2L4ElEtAylsYLWh2YRTtUOOoB4TSAdzkHgzxFyA3un9n4RzIpAie2xNfD5-eaeMsQJMWw=w1879-h939";
+              c4.src = Immagine;
               let c5 = document.createElement("div");
               c5.classList.add("card-body", "pt-0", "pb-1");
               let c6 = document.createElement("h3");
@@ -346,13 +352,16 @@
                   prodotti_scontati_trovati.push(IDProdotto);
                   let c1 = document.createElement("div");
                   c1.classList.add("col-2", "p-3");
+                  var funzione_pagina_prodotto = "paginaProdotto('" + IDProdotto + "')";
+                  c1.setAttribute("onclick", funzione_pagina_prodotto);
+                  c1.style.cursor = "pointer";
                   let c2 = document.createElement("div");
                   c2.classList.add("card", "bg-secondary-subtle", "shadow");
                   let c3 = document.createElement("div");
                   c3.classList.add("container", "p-3");
                   let c4 = document.createElement("img");
                   c4.classList.add("card-img-top", "mw-100", "mh-100", "rounded-4");
-                  c4.src = "https://lh3.googleusercontent.com/u/0/drive-viewer/AEYmBYTm7ZG98XCNFKmX-on_fPcqI2L4ElEtAylsYLWh2YRTtUOOoB4TSAdzkHgzxFyA3un9n4RzIpAie2xNfD5-eaeMsQJMWw=w1879-h939";
+                  c4.src = Immagine;
                   let c5 = document.createElement("div");
                   c5.classList.add("card-body", "pt-0", "pb-1");
                   let c6 = document.createElement("h3");
