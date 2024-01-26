@@ -285,7 +285,7 @@ app.get("/api/aggiungiPrezzo", (req, res) => {
 })
 
 app.get("/api/trovaTuttiProdotti", (req, res) => {
-    var sql = "SELECT p.Nome, p.Immagine, p.Categoria, p.IDProdotto, P.NegozioProvenienza, s2.Prezzo FROM prodotto p, storicoprezzi s2 WHERE p.IDProdotto = s2.Prodotto GROUP BY p.IDProdotto HAVING MAX(s2.Data)"
+    var sql = "SELECT DISTINCT p.Nome, p.Immagine, p.Categoria, p.IDProdotto, n.Nome, sp.Prezzo  FROM prodotto p, storicoprezzi sp, negozio n WHERE p.IDProdotto = sp.Prodotto AND p.NegozioProvenienza = n.IDNegozio GROUP BY p.IDProdotto HAVING MAX(sp.Data)"
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
@@ -298,7 +298,7 @@ app.get("/api/trovaTuttiProdotti", (req, res) => {
 })
 
 app.get("/api/trovaTuttiProdottiScontati", (req, res) => {
-    var sql = "SELECT p.Nome, p.Immagine, p.Categoria, p.IDProdotto, P.NegozioProvenienza, s.Valore AS Sconto, s2.Prezzo FROM prodotto p, validita_sconto_prodotto v, sconto s, storicoprezzi s2  WHERE p.IDProdotto = v.prodotto AND v.Sconto = s.IDSconto AND p.IDProdotto = s2.Prodotto  GROUP BY p.IDProdotto  HAVING MAX(s2.Data) UNION SELECT p.Nome, p.Immagine, p.Categoria, p.IDProdotto, P.NegozioProvenienza, s.Valore AS Sconto, s2.Prezzo  FROM prodotto p, validita_sconto_categoria v, sconto s, storicoprezzi s2  WHERE v.Categoria = p.Categoria AND s.IDSconto = v.Sconto AND p.NegozioProvenienza = s.NegozioDoveValido AND p.IDProdotto = s2.Prodotto  GROUP BY p.IDProdotto  HAVING MAX(s2.Data)"
+    var sql = "SELECT DISTINCT p.Nome, p.Immagine, p.Categoria, p.IDProdotto, n.Nome, s.Valore AS Sconto, sp.Prezzo FROM prodotto p, sconto s, storicoprezzi sp, validita_sconto_prodotto vsp, validita_sconto_categoria vsc, negozio n WHERE p.NegozioProvenienza = s.Negozio AND ((vsp.prodotto = p.IDProdotto AND vsp.Sconto = s.IDSconto) OR (vsc.CategoriaApplicabile = p.Categoria AND vsc.IDSconto = s.IDSconto)) AND p.IDProdotto = sp.Prodotto AND CURRENT_DATE() >= s.DataInizio AND CURRENT_DATE() <= s.DataFine AND p.NegozioProvenienza = n.IDNegozio GROUP BY p.IDProdotto HAVING MAX(sp.Data)"
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
@@ -313,7 +313,7 @@ app.get("/api/trovaTuttiProdottiScontati", (req, res) => {
 app.get("/api/trovaTuttiProdottiScontatiFiltroCategoria", (req, res) => {
     var Categoria = req.query.Categoria;
     console.log(req.body);
-    var sql = "SELECT p.Nome, p.Immagine, p.Categoria, p.IDProdotto, P.NegozioProvenienza, s.Valore AS Sconto, s2.Prezzo FROM prodotto p, validita_sconto_prodotto v, sconto s, storicoprezzi s2  WHERE p.IDProdotto = v.prodotto AND v.Sconto = s.IDSconto AND p.IDProdotto = s2.Prodotto AND p.Categoria = '" + Categoria + "' GROUP BY p.IDProdotto  HAVING MAX(s2.Data) UNION SELECT p.Nome, p.Immagine, p.Categoria, p.IDProdotto, P.NegozioProvenienza, s.Valore AS Sconto, s2.Prezzo  FROM prodotto p, validita_sconto_categoria v, sconto s, storicoprezzi s2  WHERE v.Categoria = p.Categoria AND s.IDSconto = v.Sconto AND p.NegozioProvenienza = s.NegozioDoveValido AND p.IDProdotto = s2.Prodotto AND p.Categoria = '" + Categoria + "' GROUP BY p.IDProdotto  HAVING MAX(s2.Data)"
+    var sql = "SELECT DISTINCT p.Nome, p.Immagine, p.Categoria, p.IDProdotto, n.Nome, s.Valore AS Sconto, sp.Prezzo FROM prodotto p, sconto s, storicoprezzi sp, validita_sconto_prodotto vsp, validita_sconto_categoria vsc, negozio n WHERE p.NegozioProvenienza = s.Negozio AND ((vsp.prodotto = p.IDProdotto AND vsp.Sconto = s.IDSconto) OR (vsc.CategoriaApplicabile = p.Categoria AND vsc.IDSconto = s.IDSconto)) AND p.IDProdotto = sp.Prodotto AND CURRENT_DATE() >= s.DataInizio AND CURRENT_DATE() <= s.DataFine AND p.Categoria = '" + Categoria + "' AND p.NegozioProvenienza = n.IDNegozio GROUP BY p.IDProdotto HAVING MAX(sp.Data)"
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
@@ -331,7 +331,7 @@ app.get("/api/trovaProdottiFiltroNome", (req, res) => {
 
 app.get("/api/trovaProdottoFiltroID", (req, res) => {
     var IDProdotto = req.query.IDProdotto;
-    var sql = "SELECT p.Nome, p.Immagine, p.Categoria, p.IDProdotto, P.NegozioProvenienza, s2.Prezzo FROM prodotto p, storicoprezzi s2 WHERE p.IDProdotto = s2.Prodotto AND p.IDProdotto ='" + IDProdotto + "' GROUP BY p.IDProdotto HAVING MAX(s2.Data)";
+    var sql = "SELECT p.Nome, p.Immagine, p.Categoria, p.IDProdotto, n.Nome, s2.Prezzo FROM prodotto p, storicoprezzi s2, negozio n WHERE p.IDProdotto = s2.Prodotto AND p.IDProdotto ='" + IDProdotto + "' AND p.NegozioProvenienza = n.IDNegozio GROUP BY p.IDProdotto HAVING MAX(s2.Data)";
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
@@ -349,7 +349,7 @@ app.get("/api/trovaProdottiFiltroNegozio", (req, res) => {
 
 app.get("/api/trovaProdottiFiltroCategoria", (req, res) => {
     var Categoria = req.query.Categoria;
-    var sql = "SELECT p.Nome, p.Immagine, p.Categoria, p.IDProdotto, P.NegozioProvenienza, s2.Prezzo FROM prodotto p, storicoprezzi s2 WHERE p.IDProdotto = s2.Prodotto AND p.Categoria = '" + Categoria + "' GROUP BY p.IDProdotto HAVING MAX(s2.Data)"
+    var sql = "SELECT p.Nome, p.Immagine, p.Categoria, p.IDProdotto, n.Nome, s2.Prezzo FROM prodotto p, storicoprezzi s2, negozio n WHERE p.IDProdotto = s2.Prodotto AND p.Categoria = '" + Categoria + "' AND p.NegozioProvenienza = n.IDNegozio GROUP BY p.IDProdotto HAVING MAX(s2.Data)"
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
