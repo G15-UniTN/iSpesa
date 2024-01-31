@@ -121,19 +121,20 @@
             var Prodotto = pair[1];
 
             var request = "/api/trovaProdottoFiltroID?IDProdotto=" + Prodotto;
+            console.log(request);
 
             fetch(url_sito + request)
             .then(response => response.json())
             .then(data => {
+                console.log(data);
                 var Nome = data[0].Nome;
                 var Immagine = data[0].Immagine;
                 var Categoria = data[0].Categoria;
-                IDProdotto = data[0].IDProdotto;
-                var NegozioProvenienza = data[0].NegozioProvenienza;
+                var Negozio = data[0].Negozio;
                 var Prezzo = data[0].Prezzo;
                 document.getElementById("Nome").innerHTML = Nome.replaceAll("_", " ");
-                document.getElementById("Negozio").innerHTML = NegozioProvenienza;
-                document.getElementById("Negozio").setAttribute("href", "/negozio?Negozio=" + NegozioProvenienza)
+                document.getElementById("Negozio").innerHTML = Negozio;
+                document.getElementById("Negozio").setAttribute("href", "/negozio?Negozio=" + Negozio)
                 document.getElementById("Prezzo").innerHTML = "€" + Prezzo + "/kg";
                 document.getElementById("Immagine").src = Immagine;
                 caricaDatiUtente();

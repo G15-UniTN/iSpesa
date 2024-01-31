@@ -94,8 +94,9 @@
         .then(data => {
           data.forEach(row => {
             Nome = row.Nome;
-            var funzione = "mostraNegozio('" + Nome + "')";
-            var funzione2 = "isActive('" + Nome + "')";
+            ID = row.IDNegozio;
+            var funzione = "mostraNegozio('" + ID + "')";
+            var funzione2 = "isActive('" + ID + "')";
             var funzioni = funzione + ";" + funzione2;
             var li = document.createElement("li");
             let a = document.createElement("a");
@@ -104,7 +105,7 @@
             li.setAttribute('style', "cursor: pointer");
             a.classList.add("nav-link");
             a.classList.add("nav-link-negozi");
-            a.id = Nome;
+            a.id = ID;
             li.setAttribute('onclick', funzioni);
             a.innerHTML = Nome.replaceAll("_", " ");
             li.appendChild(a);
@@ -117,16 +118,16 @@
       function caricaSconti(){
         var sconti_trovati = [];
         document.getElementById("listaSconti").innerHTML = "";
-        fetch(url_sito + "/api/trovaTuttiSconti")
+        fetch(url_sito + "/api/trovaScontiConCategoria")
         .then(response => response.json())
         .then(data => {
           var i = 0;
           while(i < 18 && i < data.length){
-            var NegozioDoveValido = data[i].NegozioDoveValido;
-            var CategoriaApplicabile = data[i].CategoriaApplicabile;
+            var Negozio = data[i].Negozio;
             var Valore = data[i].Valore;
-            var IDSconto = data[i].Sconto;
-            var Logo = data[i].logo; // da cambiare in .Logo
+            var IDSconto = data[i].IDSconto;
+            var Logo = data[i].Logo;
+            var Categoria = data[i].Categoria;
             sconti_trovati.push(IDSconto);
             let c1 = document.createElement("div");
             c1.classList.add("col-2", "p-3");
@@ -139,12 +140,12 @@
             c4.src = Logo;
             let c5 = document.createElement("div");
             c5.classList.add("card-body", "pt-0", "pb-1");
-            let c6 = document.createElement("h3");
-            c6.classList.add("font-nome_prodotto");
-            c6.innerHTML = NegozioDoveValido;
+            let c6 = document.createElement("h5");
+            c6.classList.add("card-title");
+            c6.innerHTML = Negozio;
             let c8 = document.createElement("h3");
             c8.classList.add("font-prezzo_nuovo", "mb-1");
-            c8.innerHTML = CategoriaApplicabile.replaceAll("_", " ");
+            c8.innerHTML = Categoria.replaceAll("_", " ");
             i++;
             c1.appendChild(c2);
             c2.appendChild(c3);
@@ -158,7 +159,7 @@
       }
 
       function mostraNegozio(negozio){
-        const request = "/api/trovaScontiFiltroNegozio?NegozioDoveValido=" + negozio;
+        const request = "/api/trovaScontiFiltroNegozio?Negozio=" + negozio;
         
         document.getElementById("listaSconti").innerHTML = "";
         var sconti_trovati = [];
@@ -167,7 +168,7 @@
         .then(data => {
           var i = 0;
           while(i < 18 && i < data.length){
-            var NegozioDoveValido = data[i].NegozioDoveValido;
+            var Negozio = data[i].Negozio;
             var CategoriaApplicabile = data[i].CategoriaApplicabile;
             var Valore = data[i].Valore;
             var IDSconto = data[i].Sconto;
@@ -186,7 +187,7 @@
             c5.classList.add("card-body", "pt-0", "pb-1");
             let c6 = document.createElement("h3");
             c6.classList.add("font-nome_prodotto");
-            c6.innerHTML = NegozioDoveValido;
+            c6.innerHTML = Negozio;
             let c8 = document.createElement("h3");
             c8.classList.add("font-prezzo_nuovo", "mb-1");
             c8.innerHTML = CategoriaApplicabile.replaceAll("_", " ");

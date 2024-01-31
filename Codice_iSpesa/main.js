@@ -39,7 +39,12 @@ app.use((req, res, next) => {
 });
 
 app.get("/", (req, res) => {
-    res.render('home.hbs');
+    if(req.session.user != null){
+        res.render("home.hbs", { title: 'user', user: req.session.user, title: 'header', header: 'header_loggato'});
+    }
+    else{
+        res.render("home.hbs", { title: 'header', header: 'header'});
+    }
 })
 
 app.get("/negozi", (req, res) => {
@@ -83,10 +88,10 @@ app.get("/prodotto", (req, res) => {
     }
     else{
         if(req.session.user != null){
-            res.render("prodotto.hbs", { title: 'user', user: req.session.user});
+            res.render("prodotto.hbs", { title: 'user', user: req.session.user, title: 'header', header: 'header_loggato'});
         }
         else{
-            res.render("prodotto.hbs");
+            res.render("prodotto.hbs", { title: 'header', header: 'header'});
         }
     }
 })
@@ -150,11 +155,30 @@ app.get("/api/eliminaVolantino", (req, res) => {
 })
 
 app.get("/api/trovaTuttiVolantini", (req, res) => {
-    
+    sql = "SELECT v.Negozio AS IDNegozio, v.DataFine, v.VolantinoFile, v.IDVolantino, n.Nome as Negozio, n.Logo FROM volantino v, negozio n WHERE v.Negozio = n.IDNegozio";
+    con.query(sql, function(err, results){
+        if(err){
+            console.log(err);
+            res.send("Error");
+            return;
+        };
+        res.json(results);
+        return;
+    });
 })
 
 app.get("/api/trovaVolantiniFiltroNegozio", (req, res) => {
-    
+    var negozio = req.query.IDNegozio;
+    sql = "SELECT v.Negozio AS IDNegozio, v.DataFine, v.VolantinoFile, v.IDVolantino, n.Nome as Negozio, n.Logo FROM volantino v, negozio n WHERE v.Negozio = n.IDNegozio AND n.IDNegozio = '" + negozio + "'";
+    con.query(sql, function(err, results){
+        if(err){
+            console.log(err);
+            res.send("Error");
+            return;
+        };
+        res.json(results);
+        return;
+    });
 })
 
 app.get("/api/trovaVolantiniFiltroPreferiti", (req, res) => {
@@ -172,7 +196,7 @@ app.get("/api/eliminaSconto", (req, res) => {
 })
 
 app.get("/api/trovaTuttiSconti", (req, res) => {
-    sql = "SELECT * FROM sconto, negozio WHERE sconto.NegozioDoveValido = negozio.Nome";
+    sql = "SELECT s.Valore, s.IDSconto, n.IDNegozio, s.DataInizio, s.DataFine, n.Nome AS Negozio, n.Logo FROM sconto s, negozio n WHERE s.Negozio = n.IDNegozio";
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
@@ -185,9 +209,8 @@ app.get("/api/trovaTuttiSconti", (req, res) => {
 })
 
 app.get("/api/trovaScontiFiltroNegozio", (req, res) => {
-    var negozio = req.query.NegozioDoveValido;
-    console.log(negozio);
-    sql = "SELECT * FROM sconto, negozio WHERE NegozioDoveValido = '" + negozio + "' AND sconto.NegozioDoveValido = negozio.Nome";
+    var negozio = req.query.Negozio;
+    sql = "SELECT s.Valore, s.IDSconto, n.IDNegozio, s.DataInizio, s.DataFine, n.Nome AS Negozio, n.Logo FROM sconto s, negozio n WHERE s.Negozio = n.IDNegozio AND n.IDNegozio = '" + negozio + "'";
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
@@ -201,6 +224,19 @@ app.get("/api/trovaScontiFiltroNegozio", (req, res) => {
 
 app.get("/api/trovaScontiFiltroCategoria", (req, res) => {
     
+})
+
+app.get("/api/trovaScontiConCategoria", (req, res) => {
+    sql = "SELECT s.Valore, s.IDSconto, n.IDNegozio, s.DataInizio, s.DataFine, n.Nome AS Negozio, n.Logo, vsc.CategoriaApplicabile AS Categoria FROM sconto s, negozio n, validita_sconto_categoria vsc WHERE s.Negozio = n.IDNegozio AND s.IDSconto = vsc.IDSconto";
+    con.query(sql, function(err, results){
+        if(err){
+            console.log(err);
+            res.send("Error");
+            return;
+        };
+        res.json(results);
+        return;
+    });
 })
 
 app.get("/api/trovaScontiFiltroProdotto", (req, res) => {
@@ -285,7 +321,7 @@ app.get("/api/aggiungiPrezzo", (req, res) => {
 })
 
 app.get("/api/trovaTuttiProdotti", (req, res) => {
-    var sql = "SELECT DISTINCT p.Nome, p.Immagine, p.Categoria, p.IDProdotto, n.Nome, sp.Prezzo  FROM prodotto p, storicoprezzi sp, negozio n WHERE p.IDProdotto = sp.Prodotto AND p.NegozioProvenienza = n.IDNegozio GROUP BY p.IDProdotto HAVING MAX(sp.Data)"
+    var sql = "SELECT DISTINCT p.Nome, p.Immagine, p.Categoria, p.IDProdotto, n.Nome as Negozio, sp.Prezzo  FROM prodotto p, storicoprezzi sp, negozio n WHERE p.IDProdotto = sp.Prodotto AND p.NegozioProvenienza = n.IDNegozio GROUP BY p.IDProdotto HAVING MAX(sp.Data)"
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
@@ -298,7 +334,7 @@ app.get("/api/trovaTuttiProdotti", (req, res) => {
 })
 
 app.get("/api/trovaTuttiProdottiScontati", (req, res) => {
-    var sql = "SELECT DISTINCT p.Nome, p.Immagine, p.Categoria, p.IDProdotto, n.Nome, s.Valore AS Sconto, sp.Prezzo FROM prodotto p, sconto s, storicoprezzi sp, validita_sconto_prodotto vsp, validita_sconto_categoria vsc, negozio n WHERE p.NegozioProvenienza = s.Negozio AND ((vsp.prodotto = p.IDProdotto AND vsp.Sconto = s.IDSconto) OR (vsc.CategoriaApplicabile = p.Categoria AND vsc.IDSconto = s.IDSconto)) AND p.IDProdotto = sp.Prodotto AND CURRENT_DATE() >= s.DataInizio AND CURRENT_DATE() <= s.DataFine AND p.NegozioProvenienza = n.IDNegozio GROUP BY p.IDProdotto HAVING MAX(sp.Data)"
+    var sql = "SELECT DISTINCT p.Nome, p.Immagine, p.Categoria, p.IDProdotto, n.Nome as Negozio, s.Valore AS Sconto, sp.Prezzo FROM prodotto p, sconto s, storicoprezzi sp, validita_sconto_prodotto vsp, validita_sconto_categoria vsc, negozio n WHERE p.NegozioProvenienza = s.Negozio AND ((vsp.prodotto = p.IDProdotto AND vsp.Sconto = s.IDSconto) OR (vsc.CategoriaApplicabile = p.Categoria AND vsc.IDSconto = s.IDSconto)) AND p.IDProdotto = sp.Prodotto AND CURRENT_DATE() >= s.DataInizio AND CURRENT_DATE() <= s.DataFine AND p.NegozioProvenienza = n.IDNegozio GROUP BY p.IDProdotto HAVING MAX(sp.Data)"
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
@@ -313,7 +349,7 @@ app.get("/api/trovaTuttiProdottiScontati", (req, res) => {
 app.get("/api/trovaTuttiProdottiScontatiFiltroCategoria", (req, res) => {
     var Categoria = req.query.Categoria;
     console.log(req.body);
-    var sql = "SELECT DISTINCT p.Nome, p.Immagine, p.Categoria, p.IDProdotto, n.Nome, s.Valore AS Sconto, sp.Prezzo FROM prodotto p, sconto s, storicoprezzi sp, validita_sconto_prodotto vsp, validita_sconto_categoria vsc, negozio n WHERE p.NegozioProvenienza = s.Negozio AND ((vsp.prodotto = p.IDProdotto AND vsp.Sconto = s.IDSconto) OR (vsc.CategoriaApplicabile = p.Categoria AND vsc.IDSconto = s.IDSconto)) AND p.IDProdotto = sp.Prodotto AND CURRENT_DATE() >= s.DataInizio AND CURRENT_DATE() <= s.DataFine AND p.Categoria = '" + Categoria + "' AND p.NegozioProvenienza = n.IDNegozio GROUP BY p.IDProdotto HAVING MAX(sp.Data)"
+    var sql = "SELECT DISTINCT p.Nome, p.Immagine, p.Categoria, p.IDProdotto, n.Nome as Negozio, s.Valore AS Sconto, sp.Prezzo FROM prodotto p, sconto s, storicoprezzi sp, validita_sconto_prodotto vsp, validita_sconto_categoria vsc, negozio n WHERE p.NegozioProvenienza = s.Negozio AND ((vsp.prodotto = p.IDProdotto AND vsp.Sconto = s.IDSconto) OR (vsc.CategoriaApplicabile = p.Categoria AND vsc.IDSconto = s.IDSconto)) AND p.IDProdotto = sp.Prodotto AND CURRENT_DATE() >= s.DataInizio AND CURRENT_DATE() <= s.DataFine AND p.Categoria = '" + Categoria + "' AND p.NegozioProvenienza = n.IDNegozio GROUP BY p.IDProdotto HAVING MAX(sp.Data)"
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
@@ -331,7 +367,7 @@ app.get("/api/trovaProdottiFiltroNome", (req, res) => {
 
 app.get("/api/trovaProdottoFiltroID", (req, res) => {
     var IDProdotto = req.query.IDProdotto;
-    var sql = "SELECT p.Nome, p.Immagine, p.Categoria, p.IDProdotto, n.Nome, s2.Prezzo FROM prodotto p, storicoprezzi s2, negozio n WHERE p.IDProdotto = s2.Prodotto AND p.IDProdotto ='" + IDProdotto + "' AND p.NegozioProvenienza = n.IDNegozio GROUP BY p.IDProdotto HAVING MAX(s2.Data)";
+    var sql = "SELECT p.Nome, p.Immagine, p.Categoria, p.IDProdotto, n.Nome as Negozio, s2.Prezzo FROM prodotto p, storicoprezzi s2, negozio n WHERE p.IDProdotto = s2.Prodotto AND p.IDProdotto ='" + IDProdotto + "' AND p.NegozioProvenienza = n.IDNegozio GROUP BY p.IDProdotto HAVING MAX(s2.Data)";
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
@@ -349,7 +385,7 @@ app.get("/api/trovaProdottiFiltroNegozio", (req, res) => {
 
 app.get("/api/trovaProdottiFiltroCategoria", (req, res) => {
     var Categoria = req.query.Categoria;
-    var sql = "SELECT p.Nome, p.Immagine, p.Categoria, p.IDProdotto, n.Nome, s2.Prezzo FROM prodotto p, storicoprezzi s2, negozio n WHERE p.IDProdotto = s2.Prodotto AND p.Categoria = '" + Categoria + "' AND p.NegozioProvenienza = n.IDNegozio GROUP BY p.IDProdotto HAVING MAX(s2.Data)"
+    var sql = "SELECT p.Nome, p.Immagine, p.Categoria, p.IDProdotto, n.Nome as Negozio, s2.Prezzo FROM prodotto p, storicoprezzi s2, negozio n WHERE p.IDProdotto = s2.Prodotto AND p.Categoria = '" + Categoria + "' AND p.NegozioProvenienza = n.IDNegozio GROUP BY p.IDProdotto HAVING MAX(s2.Data)"
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
