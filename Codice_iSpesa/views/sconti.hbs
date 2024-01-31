@@ -128,7 +128,6 @@
             var IDSconto = data[i].IDSconto;
             var Logo = data[i].Logo;
             var Categoria = data[i].Categoria;
-            sconti_trovati.push(IDSconto);
             let c1 = document.createElement("div");
             c1.classList.add("col-2", "p-3");
             let c2 = document.createElement("div");
@@ -146,7 +145,6 @@
             let c8 = document.createElement("h3");
             c8.classList.add("font-prezzo_nuovo", "mb-1");
             c8.innerHTML = Categoria.replaceAll("_", " ");
-            i++;
             c1.appendChild(c2);
             c2.appendChild(c3);
             c3.appendChild(c4);
@@ -154,12 +152,13 @@
             c5.appendChild(c6);
             c5.appendChild(c8);
             document.getElementById("listaSconti").appendChild(c1);
+            i++;
           }
         })
       }
 
       function mostraNegozio(negozio){
-        const request = "/api/trovaScontiFiltroNegozio?Negozio=" + negozio;
+        const request = "/api/trovaScontiConCategoriaFiltroNegozio?Negozio=" + negozio;
         
         document.getElementById("listaSconti").innerHTML = "";
         var sconti_trovati = [];
@@ -169,11 +168,10 @@
           var i = 0;
           while(i < 18 && i < data.length){
             var Negozio = data[i].Negozio;
-            var CategoriaApplicabile = data[i].CategoriaApplicabile;
             var Valore = data[i].Valore;
-            var IDSconto = data[i].Sconto;
-            var Logo = data[i].logo; // da cambiare in .Logo
-            sconti_trovati.push(IDSconto);
+            var IDSconto = data[i].IDSconto;
+            var Logo = data[i].Logo;
+            var Categoria = data[i].Categoria;
             let c1 = document.createElement("div");
             c1.classList.add("col-2", "p-3");
             let c2 = document.createElement("div");
@@ -185,13 +183,12 @@
             c4.src = Logo;
             let c5 = document.createElement("div");
             c5.classList.add("card-body", "pt-0", "pb-1");
-            let c6 = document.createElement("h3");
-            c6.classList.add("font-nome_prodotto");
+            let c6 = document.createElement("h5");
+            c6.classList.add("card-title");
             c6.innerHTML = Negozio;
             let c8 = document.createElement("h3");
             c8.classList.add("font-prezzo_nuovo", "mb-1");
-            c8.innerHTML = CategoriaApplicabile.replaceAll("_", " ");
-            i++;
+            c8.innerHTML = Categoria.replaceAll("_", " ");
             c1.appendChild(c2);
             c2.appendChild(c3);
             c3.appendChild(c4);
@@ -199,6 +196,7 @@
             c5.appendChild(c6);
             c5.appendChild(c8);
             document.getElementById("listaSconti").appendChild(c1);
+            i++;
           }
         })
       }

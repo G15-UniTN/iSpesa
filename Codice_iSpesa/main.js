@@ -48,7 +48,12 @@ app.get("/", (req, res) => {
 })
 
 app.get("/negozi", (req, res) => {
-    res.render('negozi.hbs');
+    if(req.session.user != null){
+        res.render("negozi.hbs", { title: 'user', user: req.session.user, title: 'header', header: 'header_loggato'});
+    }
+    else{
+        res.render("negozi.hbs", { title: 'header', header: 'header'});
+    };
 })
 
 app.get("/negozio", (req, res) => {
@@ -57,24 +62,53 @@ app.get("/negozio", (req, res) => {
     }
     else{
         if(req.session.user != null){
-            res.render("negozio.hbs", { title: 'user', user: req.session.user});
+            res.render("negozio.hbs", { title: 'user', user: req.session.user, title: 'header', header: 'header_loggato'});
         }
         else{
-            res.render("negozio.hbs");
+            res.render("negozio.hbs", { title: 'header', header: 'header'});
         };
     }
 })
 
 app.get("/sconti", (req, res) => {
-    res.render('sconti.hbs');
+    if(req.session.user != null){
+        res.render("sconti.hbs", { title: 'user', user: req.session.user, title: 'header', header: 'header_loggato'});
+    }
+    else{
+        res.render("sconti.hbs", { title: 'header', header: 'header'});
+    };
 })
 
 app.get("/volantini", (req, res) => {
-    res.render('volantini.hbs');
+    if(req.session.user != null){
+        res.render("volantini.hbs", { title: 'user', user: req.session.user, title: 'header', header: 'header_loggato'});
+    }
+    else{
+        res.render("volantini.hbs", { title: 'header', header: 'header'});
+    };
 })
 
 app.get("/login", (req, res) => {
     res.render('login.hbs');
+})
+
+app.get("/logout", (req, res) => {
+    if(req.session.user != null){
+        req.session.user = null;
+        res.redirect("/");
+    }
+    else{
+        res.redirect("/");
+    }
+})
+
+app.get("/preferiti", (req, res) => {
+    if(req.session.user != null){
+        res.render("preferiti.hbs", { title: 'user', user: req.session.user, title: 'header', header: 'header_loggato'});
+    }
+    else{
+        res.render("preferiti.hbs", { title: 'header', header: 'header'});
+    };
 })
 
 app.get("/signup", (req, res) => {
@@ -92,7 +126,7 @@ app.get("/prodotto", (req, res) => {
         }
         else{
             res.render("prodotto.hbs", { title: 'header', header: 'header'});
-        }
+        };
     }
 })
 
@@ -181,10 +215,6 @@ app.get("/api/trovaVolantiniFiltroNegozio", (req, res) => {
     });
 })
 
-app.get("/api/trovaVolantiniFiltroPreferiti", (req, res) => {
-    
-})
-
 //Sconti
 
 app.get("/api/salvaSconto", (req, res) => {
@@ -239,15 +269,26 @@ app.get("/api/trovaScontiConCategoria", (req, res) => {
     });
 })
 
+app.get("/api/trovaScontiConCategoriaFiltroNegozio", (req, res) => {
+    var negozio = req.query.Negozio;
+    sql = "SELECT s.Valore, s.IDSconto, n.IDNegozio, s.DataInizio, s.DataFine, n.Nome AS Negozio, n.Logo, vsc.CategoriaApplicabile AS Categoria FROM sconto s, negozio n, validita_sconto_categoria vsc WHERE s.Negozio = n.IDNegozio AND s.IDSconto = vsc.IDSconto AND s.Negozio = '" + negozio + "'";
+    con.query(sql, function(err, results){
+        if(err){
+            console.log(err);
+            res.send("Error");
+            return;
+        };
+        res.json(results);
+        return;
+    });
+})
+
+
 app.get("/api/trovaScontiFiltroProdotto", (req, res) => {
     
 })
 
 app.get("/api/trovaScontiFiltroValore", (req, res) => {
-    
-})
-
-app.get("/api/trovaScontiFiltroPreferiti", (req, res) => {
     
 })
 
@@ -295,10 +336,6 @@ app.get("/api/trovaTuttiNegoziFiltroNome", (req, res) => {
 })
 
 app.get("/api/trovaTuttiNegoziFiltroLocalità", (req, res) => {
-    
-})
-
-app.get("/api/trovaTuttiNegoziFiltroPreferiti", (req, res) => {
     
 })
 
@@ -397,10 +434,6 @@ app.get("/api/trovaProdottiFiltroCategoria", (req, res) => {
     })
 })
 
-app.get("/api/trovaProdottiFiltroPreferiti", (req, res) => {
-    
-})
-
 //Utente
 
 app.get("/api/salvaUtente", (req, res) => {
@@ -494,22 +527,42 @@ app.get("/api/logout", (req, res) => {
 })
 
 app.get("/api/ottieniProdottiPreferiti", (req, res) => {
-    
+    if(req.session.user != null){
+        var user = req.session.user;
+        var sql = "SELECT DISTINCT p.Nome, p.Immagine, p.Categoria, p.IDProdotto, n.Nome as Negozio, sp.Prezzo  FROM prodotto p, storicoprezzi sp, negozio n, prodottipreferiti pp WHERE p.IDProdotto = sp.Prodotto AND p.NegozioProvenienza = n.IDNegozio AND p.IDProdotto = pp.Prodotto AND pp.Utente = '" + user + "' GROUP BY p.IDProdotto HAVING MAX(sp.Data)";
+        con.query(sql, function(err, results){
+            if(err){
+                console.log(err);
+                res.send("Error");
+                return;
+            };
+            res.json(results);
+            return;
+        })
+    }
+    else{
+        res.send("Richiesta inviata senza aver effettuato il login");
+    }
 })
 
 app.get("/api/ottieniProdottiPreferitiFiltroProdotto", (req, res) => {
-    var Username = req.session.user;
-    var Prodotto = req.query.IDProdotto;
-    var sql = "SELECT * FROM prodottipreferiti WHERE Utente = '" + Username + "' AND Prodotto = '" + Prodotto + "'";
-    con.query(sql, function(err, results){
-        if(err){
-            console.log(err);
-            res.send("Error");
+    if(req.session.user != null){
+        var Username = req.session.user;
+        var Prodotto = req.query.IDProdotto;
+        var sql = "SELECT * FROM prodottipreferiti WHERE Utente = '" + Username + "' AND Prodotto = '" + Prodotto + "'";
+        con.query(sql, function(err, results){
+            if(err){
+                console.log(err);
+                res.send("Error");
+                return;
+            };
+            res.json(results);
             return;
-        };
-        res.json(results);
-        return;
-    })
+        })
+    }
+    else{
+        res.send("Richiesta inviata senza aver effettuato il login");
+    }
 })
 
 app.get("/api/ottieniNegoziPreferiti", (req, res) => {

@@ -72,7 +72,7 @@
         }
     </style>
 </head>
-  <body onload="caricaDati()">{{>"{{ header }}"}}
+  <body onload="caricaDati()">{{> (lookup . 'header')}}
     <!-- Slideshow container -->
     <div class="slideshow-container" id="slideshowProdotti">
     </div>
@@ -234,7 +234,7 @@
               c5.appendChild(c8);
               document.getElementById("listaProdotti").appendChild(c1);
             }
-            if(i < 20){
+            if(i < 18){
               fetch(url_sito + "/api/trovaTuttiProdotti")
               .then(response => response.json())
               .then(data => {
@@ -338,7 +338,7 @@
               c5.appendChild(c8);
               document.getElementById("listaProdotti").appendChild(c1);
             }
-            if(i < 20){
+            if(i < 18){
               fetch(url_sito + request)
               .then(response => response.json())
               .then(data => {
