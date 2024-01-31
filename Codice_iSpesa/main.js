@@ -339,6 +339,20 @@ app.get("/api/trovaTuttiNegoziFiltroLocalità", (req, res) => {
     
 })
 
+app.get("/api/trovaNegozioFiltroID", (req, res) => {
+    var IDNegozio = req.query.IDNegozio;
+    var sql = "SELECT * FROM negozio WHERE IDNegozio = '" + IDNegozio + "'";
+    con.query(sql, function(err, results){
+        if(err){
+            console.log(err);
+            res.send("Error");
+            return;
+        };
+        res.json(results);
+        return;
+    })
+})
+
 //Prodotti
 
 app.get("/api/salvaProdotto", (req, res) => {
@@ -404,7 +418,7 @@ app.get("/api/trovaProdottiFiltroNome", (req, res) => {
 
 app.get("/api/trovaProdottoFiltroID", (req, res) => {
     var IDProdotto = req.query.IDProdotto;
-    var sql = "SELECT p.Nome, p.Immagine, p.Categoria, p.IDProdotto, n.Nome as Negozio, s2.Prezzo FROM prodotto p, storicoprezzi s2, negozio n WHERE p.IDProdotto = s2.Prodotto AND p.IDProdotto ='" + IDProdotto + "' AND p.NegozioProvenienza = n.IDNegozio GROUP BY p.IDProdotto HAVING MAX(s2.Data)";
+    var sql = "SELECT p.Nome, p.Immagine, p.Categoria, p.IDProdotto, n.Nome as Negozio, n.IDNegozio, s2.Prezzo FROM prodotto p, storicoprezzi s2, negozio n WHERE p.IDProdotto = s2.Prodotto AND p.IDProdotto ='" + IDProdotto + "' AND p.NegozioProvenienza = n.IDNegozio GROUP BY p.IDProdotto HAVING MAX(s2.Data)";
     con.query(sql, function(err, results){
         if(err){
             console.log(err);

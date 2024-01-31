@@ -68,7 +68,7 @@
         }
     </style>
 </head>
-  <body onload="caricaDati()">{{>header}}
+  <body onload="caricaDati()">{{> (lookup . 'header')}}
     <nav class="navbar navbar-expand-lg navbar-light bg-dark-subtle">
         <div class="container-fluid">
             <div class="d-flex">
@@ -109,9 +109,13 @@
             var Ubicazione = data[i].Ubicazione;
             var Orari = data[i].Orari;
             var Nome = data[i].Nome;
-            var Logo = data[i].logo; // da cambiare in .Logo
+            var Logo = data[i].Logo;
+            var IDNegozio = data[i].IDNegozio;
             let c1 = document.createElement("div");
             c1.classList.add("col-2", "p-3");
+            var funzione_pagina_negozio = "paginaNegozio('" + IDNegozio + "')";
+            c1.setAttribute("onclick", funzione_pagina_negozio);
+            c1.style.cursor = "pointer";
             let c2 = document.createElement("div");
             c2.classList.add("card", "bg-secondary-subtle", "shadow");
             let c3 = document.createElement("div");
@@ -137,6 +141,11 @@
             document.getElementById("listaNegozi").appendChild(c1);
           }
         })
+      }
+
+      function paginaNegozio(IDNegozio){
+        const request = "/negozio?Negozio=" + IDNegozio;
+        window.location.replace(request);
       }
     </script>
   </body>
