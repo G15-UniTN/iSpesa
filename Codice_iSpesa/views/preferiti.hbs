@@ -84,16 +84,6 @@
     </div>
     <div class="container p-0">
         <div class="row" id="listaNegozi">
-          <div class="col-2 p-3">
-            <div class="card bg-secondary-subtle shadow">
-              <img src="/img/logo/conad.png" class="card-img-top p-3" alt="Logo del negozio">
-              <div class="card-body">
-                <h5 class="card-title">
-                  INSERIRE NOME DEL NEGOZIO AAAAAAAAAAAAA
-                </h5>
-              </div>
-            </div>
-          </div>
         </div>
     </div>
     <div class="p-1 bg-dark">
@@ -107,65 +97,116 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
     <script>
-        const url_sito = "http://localhost:8080";
+      const url_sito = "http://localhost:8080";
 
-        function caricaDati(){
-            caricaNegoziPreferiti();
-            caricaProdottiPreferiti();
-        }
-        
-        function caricaNegoziPreferiti(){
-            
-        }
+      function caricaDati(){
+          caricaNegoziPreferiti();
+          caricaProdottiPreferiti();
+      }
+      
+      function caricaNegoziPreferiti(){
+        document.getElementById("listaNegozi").innerHTML = "";
+        fetch(url_sito + "/api/ottieniNegoziPreferiti")
+        .then(response => response.json())
+        .then(data => {
+          var i = 0;
+          while(i < 18 && i < data.length){
+            var Ubicazione = data[i].Ubicazione;
+            var Orari = data[i].Orari;
+            var Nome = data[i].Nome;
+            var Logo = data[i].Logo;
+            var IDNegozio = data[i].IDNegozio;
+            let c1 = document.createElement("div");
+            c1.classList.add("col-2", "p-3");
+            var funzione_pagina_negozio = "paginaNegozio('" + IDNegozio + "')";
+            c1.setAttribute("onclick", funzione_pagina_negozio);
+            c1.style.cursor = "pointer";
+            let c2 = document.createElement("div");
+            c2.classList.add("card", "bg-secondary-subtle", "shadow");
+            let c3 = document.createElement("div");
+            c3.classList.add("container", "p-3");
+            let c4 = document.createElement("img");
+            c4.classList.add("card-img-top", "p-3");
+            c4.src = Logo;
+            let c5 = document.createElement("div");
+            c5.classList.add("card-body");
+            let c6 = document.createElement("h5");
+            c6.classList.add("card-title");
+            c6.innerHTML = Nome;
+            let c8 = document.createElement("h3");
+            c8.classList.add("font-prezzo_nuovo", "mb-1");
+            c8.innerHTML = Orari;
+            i++;
+            c1.appendChild(c2);
+            c2.appendChild(c3);
+            c3.appendChild(c4);
+            c2.appendChild(c5);
+            c5.appendChild(c6);
+            c5.appendChild(c8);
+            document.getElementById("listaNegozi").appendChild(c1);
+          }
+        })
+      }
 
-        function caricaProdottiPreferiti(){
-            fetch(url_sito + "/api/ottieniProdottiPreferiti")
-            .then(response => response.json())
-            .then(data => {
-            var i = 0;
-            while(i < 18 && i < data.length){
-                var Nome = data[i].Nome;
-                var Immagine = data[i].Immagine;
-                var Categoria = data[i].Categoria;
-                var IDProdotto = data[i].IDProdotto;
-                var NegozioProvenienza = data[i].NegozioProvenienza;
-                var Sconto = data[i].Sconto;
-                var Prezzo = data[i].Prezzo;
-                let c1 = document.createElement("div");
-                c1.classList.add("col-2", "p-3");
-                var funzione_pagina_prodotto = "paginaProdotto('" + IDProdotto + "')";
-                c1.setAttribute("onclick", funzione_pagina_prodotto);
-                c1.style.cursor = "pointer";
-                let c2 = document.createElement("div");
-                c2.classList.add("card", "bg-secondary-subtle", "shadow");
-                let c3 = document.createElement("div");
-                c3.classList.add("container", "p-3");
-                let c4 = document.createElement("img");
-                c4.classList.add("card-img-top", "mw-100", "mh-100", "rounded-4");
-                c4.src = Immagine;
-                let c5 = document.createElement("div");
-                c5.classList.add("card-body", "pt-0", "pb-1");
-                let c6 = document.createElement("h3");
-                c6.classList.add("font-nome_prodotto");
-                c6.innerHTML = Nome.replaceAll("_", " ");
-                let c7 = document.createElement("p");
-                c7.classList.add("font-sconto", "mb-0");
-                c7.innerHTML = " ";
-                let c8 = document.createElement("h3");
-                c8.classList.add("font-prezzo_nuovo", "mb-1");
-                c8.innerHTML = "€" + Prezzo + "/kg";
-                i++;
-                c1.appendChild(c2);
-                c2.appendChild(c3);
-                c3.appendChild(c4);
-                c2.appendChild(c5);
-                c5.appendChild(c6);
-                c5.appendChild(c7);
-                c5.appendChild(c8);
-                document.getElementById("listaProdotti").appendChild(c1);
-            }
-            })
+
+      function caricaProdottiPreferiti(){
+        fetch(url_sito + "/api/ottieniProdottiPreferiti")
+        .then(response => response.json())
+        .then(data => {
+        var i = 0;
+        while(i < 18 && i < data.length){
+            var Nome = data[i].Nome;
+            var Immagine = data[i].Immagine;
+            var Categoria = data[i].Categoria;
+            var IDProdotto = data[i].IDProdotto;
+            var NegozioProvenienza = data[i].NegozioProvenienza;
+            var Sconto = data[i].Sconto;
+            var Prezzo = data[i].Prezzo;
+            let c1 = document.createElement("div");
+            c1.classList.add("col-2", "p-3");
+            var funzione_pagina_prodotto = "paginaProdotto('" + IDProdotto + "')";
+            c1.setAttribute("onclick", funzione_pagina_prodotto);
+            c1.style.cursor = "pointer";
+            let c2 = document.createElement("div");
+            c2.classList.add("card", "bg-secondary-subtle", "shadow");
+            let c3 = document.createElement("div");
+            c3.classList.add("container", "p-3");
+            let c4 = document.createElement("img");
+            c4.classList.add("card-img-top", "mw-100", "mh-100", "rounded-4");
+            c4.src = Immagine;
+            let c5 = document.createElement("div");
+            c5.classList.add("card-body", "pt-0", "pb-1");
+            let c6 = document.createElement("h3");
+            c6.classList.add("font-nome_prodotto");
+            c6.innerHTML = Nome.replaceAll("_", " ");
+            let c7 = document.createElement("p");
+            c7.classList.add("font-sconto", "mb-0");
+            c7.innerHTML = " ";
+            let c8 = document.createElement("h3");
+            c8.classList.add("font-prezzo_nuovo", "mb-1");
+            c8.innerHTML = "€" + Prezzo + "/kg";
+            i++;
+            c1.appendChild(c2);
+            c2.appendChild(c3);
+            c3.appendChild(c4);
+            c2.appendChild(c5);
+            c5.appendChild(c6);
+            c5.appendChild(c7);
+            c5.appendChild(c8);
+            document.getElementById("listaProdotti").appendChild(c1);
         }
+        })
+      }
+
+      function paginaNegozio(IDNegozio){
+        const request = "/negozio?Negozio=" + IDNegozio;
+        window.location.replace(request);
+      }
+
+      function paginaProdotto(IDProdotto){
+        const request = "/prodotto?IDProdotto=" + IDProdotto;
+        window.location.replace(request);
+      }
     </script>
   </body>
 </html>

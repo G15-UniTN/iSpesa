@@ -145,13 +145,13 @@
         function caricaDatiUtente(){
             Username = "{{ user }}";
             if(Username != null && Username != ""){
-                var request = "/api/ottieniProdottiPreferiti?IDProdotto=" + IDProdotto;
+                var request = "/api/checkProdottoPreferito?IDProdotto=" + IDProdotto;
                 var Stella = document.getElementById("Stella");
                 Stella.hidden = false;
                 fetch(url_sito + request)
                 .then(response => response.json())
                 .then(data => {
-                    if(data.length == 0){
+                    if(data.length > 0){
                         Stella.src = "/img/sito/stella_gialla.png";
                         preferito = true;
                     }
