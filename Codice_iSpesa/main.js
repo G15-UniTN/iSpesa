@@ -17,10 +17,12 @@ const swaggerOptions ={
     apis: ['main.js'],
 };
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
+const methodOverride = require('method-override');
 
 app.use(express.static(path.join(__dirname, "public")));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 app.use(express.json());
+app.use(methodOverride('_method'));
 app.set("view engine", "hbs");
 app.set("views", path.join(__dirname, "views"));
 hbs.registerPartials(__dirname + "/views/partials");
@@ -708,15 +710,54 @@ app.patch("/api/modificaPassword", (req, res) => {
     var User = req.session.user;
     if(checkAdmin(User) || User == req.body.Username){
         var Username = req.body.Username;
-        var PasswordNuova = req.body.PasswordNuova;
-        sql = "UPDATE utente_registrato SET Password = '" + PasswordNuova + "' WHERE Username = '" + Username + "'";
+        var PasswordVecchia = req.body.PasswordVecchia;
+        var PasswordNuova = req.body.Password;
+        sql = "SELECT * FROM utente_registrato WHERE Password = '" + PasswordVecchia + "' AND Username = '" + Username + "'";
+        con.query(sql, function(err, results){ // Controlla se la password vecchia corrisponde con quella nel database
+            if(err){
+                console.log(err);
+                res.send("Errore");
+                return;
+            }
+            else if(results.length > 0){
+                sql = "UPDATE utente_registrato SET Password = '" + PasswordNuova + "' WHERE Username = '" + Username + "'";
+                con.query(sql, function(err, results){
+                    if(err){
+                        console.log(err);
+                        res.send("Errore");
+                        return;
+                    };
+                    res.status(200);
+                    res.redirect('back');
+                    return;
+                });
+            }
+            else{
+                res.send("Password vecchia sbagliata");
+                return;
+            }
+        });
+    }
+    else{
+        res.send("Privilegi insufficenti");
+        return;
+    }
+})
+
+app.patch("/api/modificaEmail", (req, res) => {
+    var User = req.session.user;
+    if(checkAdmin(User) || User == req.body.Username){
+        var Username = req.body.Username;
+        var EmailNuova = req.body.Email;
+        sql = "UPDATE utente_registrato SET Email = '" + EmailNuova + "' WHERE Username = '" + Username + "'";
         con.query(sql, function(err, results){
             if(err){
                 console.log(err);
                 res.send("Errore");
                 return;
             };
-            res.send("Aggiornato");
+            res.status(200);
+            res.redirect('back');
             return;
         });
     }
@@ -726,7 +767,7 @@ app.patch("/api/modificaNumeroTelefono", (req, res) => {
     var User = req.session.user;
     if(checkAdmin(User) || User == req.body.Username){
         var Username = req.body.Username;
-        var TelefonoNuovo = req.body.TelefonoNuovo;
+        var TelefonoNuovo = req.body.Telefono;
         sql = "UPDATE utente_registrato SET Telefono = '" + TelefonoNuovo + "' WHERE Username = '" + Username + "'";
         con.query(sql, function(err, results){
             if(err){
@@ -734,7 +775,8 @@ app.patch("/api/modificaNumeroTelefono", (req, res) => {
                 res.send("Errore");
                 return;
             };
-            res.send("Aggiornato");
+            res.status(200);
+            res.send('back');
             return;
         });
     }
@@ -824,7 +866,7 @@ app.delete("/api/rimuoviNegozioDaiPreferiti", (req, res) => {
 
 app.get("/api/ottieniDatiUtente", (req, res) => {
     var User = req.session.user;
-    if(checkAdmin(User)){
+    if(checkAdmin(User) || req.query.Username == User){
         var Username = req.query.Username;
         sql = "SELECT * FROM utente_registrato WHERE Username = '" + Username + "'";
         con.query(sql, function(err, results){
@@ -836,6 +878,9 @@ app.get("/api/ottieniDatiUtente", (req, res) => {
             res.send(results);
             return;
         });
+    }
+    else{
+        res.send("Privilegi insufficenti");
     }
 })
 
