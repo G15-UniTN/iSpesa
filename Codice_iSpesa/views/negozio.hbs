@@ -390,10 +390,13 @@
             }
         }
 
+        document.getElementById("inviaRecensione").addEventListener("submit", (e) => {
+            e.preventDefault();
+        })
+
         function inviaRecensione(){
             document.getElementById("IDNegozio").value = IDNegozio;
-            console.log(document.getElementById("IDNegozio").value);
-            //document.getElementById("inviaRecensione").submit();
+            document.getElementById("inviaRecensione").submit();
         }
 
         

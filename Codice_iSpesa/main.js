@@ -109,11 +109,8 @@ app.get("/login", (req, res) => {
 app.get("/logout", (req, res) => {
     if(req.session.user != null){
         req.session.user = null;
-        res.redirect("/");
     }
-    else{
-        res.redirect("/");
-    }
+    res.redirect("/");
 })
 
 app.get("/preferiti", (req, res) => {
@@ -122,6 +119,15 @@ app.get("/preferiti", (req, res) => {
     }
     else{
         res.render("preferiti.hbs", { title: 'header', header: 'header'});
+    };
+})
+
+app.get("/area_personale", (req, res) => {
+    if(req.session.user != null){
+        res.render("area_personale.hbs", { title: 'user', user: req.session.user, title: 'header', header: 'header_loggato'});
+    }
+    else{
+        res.render("area_personale.hbs", { title: 'header', header: 'header'});
     };
 })
 
@@ -147,7 +153,7 @@ app.get("/prodotto", (req, res) => {
 app.post("/login", (req, res) => {
     var username = req.body.username;
     var password = req.body.password;
-    var sql = "SELECT Username, Password FROM utente_registrato WHERE Username = '" + username + "' AND Password = '" + password + "'";
+    var sql = "SELECT Username, Password, isAdmin FROM utente_registrato WHERE Username = '" + username + "' AND Password = '" + password + "'";
     con.connect(function(err) {
         if (err) console.log(err);
         con.query(sql, function(err, result, fields){
@@ -155,11 +161,13 @@ app.post("/login", (req, res) => {
             if(result.length > 0){
                 req.session.regenerate(function(){
                     req.session.user = username;
-                    return res.redirect("/");
+                    res.redirect("/");
+                    return;
                 })
             }
             else{
-                return res.redirect("/login?credenziali_errate=true");
+                res.redirect("/login?credenziali_errate=true");
+                return;
             }
         })
     })
@@ -176,13 +184,15 @@ app.post("/registrati", (req, res) => {
         con.query(check_fields, function(err, result, fields){
             if(err) console.log(err);
             if(result.length > 0){
-                return res.redirect("/signup?exists_username=true")
+                res.redirect("/signup?exists_username=true");
+                return;
             }
             else{
                 query_new_user = "INSERT INTO utente_registrato (Username, FotoProfilo, Email, Telefono, Password) VALUES ('" + username + "','" + "/img/sito/pfp.jpg" + "','" + email + "','" + number + "','" + password + "')";
                 con.query(query_new_user, function(err, result, fields){
                     if(err) console.log(err);
-                    return res.redirect("/login");
+                    res.redirect("/login");
+                    return;
                 })
             }
         })
@@ -935,14 +945,19 @@ app.post("/api/salvaRecensione", (req, res) => {
         var N_stelle = req.body.Stelle;
         var Testo = req.body.Testo;
         var Negozio = req.body.IDNegozio;
-        var sql = "INSERT INTO recensione (Titolo, Testo, N_stelle, Data_creazione, Utente, Negozio) VALUES ('" + Titolo + "', '" + Testo + "', '" + N_stelle + "','" + "getdate()" + "','" + Username + "','" + Negozio + "')";
+        if(N_stelle < 1 || N_stelle > 5){
+            res.send("Invio errato");
+            return;
+        }
+        var sql = "INSERT INTO recensione (Titolo, Testo, N_stelle, Utente, Negozio) VALUES ('" + Titolo + "', '" + Testo + "', '" + N_stelle + "','" + Username + "','" + Negozio + "')";
         con.query(sql, function(err, results){
             if(err){
                 console.log(err);
                 res.send("Errore");
                 return;
             };
-            res.json(results);
+            res.status(200);
+            res.redirect('back');
             return;
         })
     }
