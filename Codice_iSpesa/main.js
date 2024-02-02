@@ -2,11 +2,25 @@ const path = require("path");
 const fs = require("fs");
 const express = require ("express");
 const app = express();
+const swaggerUi = require('swagger-ui-express');
+const swaggerJsDoc = require('swagger-jsdoc');
 const hbs = require("hbs");
 const mysql = require("mysql");
 const session = require("express-session");
+const swaggerOptions ={
+    swaggerDefinition: {
+        info : {
+            title: 'iSpesa API',
+            version: '1.0.0',
+        }
+    },
+    apis: ['main.js'],
+};
+const swaggerDocs = swaggerJsDoc(swaggerOptions);
 
 app.use(express.static(path.join(__dirname, "public")));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+app.use(express.json());
 app.set("view engine", "hbs");
 app.set("views", path.join(__dirname, "views"));
 hbs.registerPartials(__dirname + "/views/partials");
@@ -179,20 +193,51 @@ app.post("/registrati", (req, res) => {
 
 //Volantini
 
-app.get("/api/salvaVolantino", (req, res) => {
-    
+app.post("/api/salvaVolantino", (req, res) => {
+    var Negozio = req.body.Negozio;
+    var DataFine = req.body.DataFine;
+    var VolantinoFile = req.body.VolantinoFile;
+    sql = "INSERT INTO volantino (Negozio, DataFine, VolantinoFile) VALUES ('" + Negozio + "','" + DataFine + "','" + VolantinoFile +"')";
+    con.query(sql, function(err, results){
+        if(err){
+            console.log(err);
+            res.send("Errore");
+            return;
+        };
+        res.send("Aggiunto");
+        return;
+    });
 })
 
-app.get("/api/eliminaVolantino", (req, res) => {
-    
+app.delete("/api/eliminaVolantino", (req, res) => {
+    var IDVolantino = req.body.IDVolantino;
+    sql = "DELETE FROM volantino WHERE IDVolantino = '" + IDVolantino + "'";
+    con.query(sql, function(err, results){
+        if(err){
+            console.log(err);
+            res.send("Errore");
+            return;
+        };
+        res.send("Rimosso");
+        return;
+    });
 })
 
+/**
+ * @swagger
+ * /api/trovaTuttiVolantini:
+ *  get:
+ *      description: Trova tutti i volantini
+ *      responses:
+ *          200:
+ *              description: Success
+ */
 app.get("/api/trovaTuttiVolantini", (req, res) => {
     sql = "SELECT v.Negozio AS IDNegozio, v.DataFine, v.VolantinoFile, v.IDVolantino, n.Nome as Negozio, n.Logo FROM volantino v, negozio n WHERE v.Negozio = n.IDNegozio";
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Error");
+            res.send("Errore");
             return;
         };
         res.json(results);
@@ -201,12 +246,12 @@ app.get("/api/trovaTuttiVolantini", (req, res) => {
 })
 
 app.get("/api/trovaVolantiniFiltroNegozio", (req, res) => {
-    var negozio = req.query.IDNegozio;
-    sql = "SELECT v.Negozio AS IDNegozio, v.DataFine, v.VolantinoFile, v.IDVolantino, n.Nome as Negozio, n.Logo FROM volantino v, negozio n WHERE v.Negozio = n.IDNegozio AND n.IDNegozio = '" + negozio + "'";
+    var Negozio = req.query.IDNegozio;
+    sql = "SELECT v.Negozio AS IDNegozio, v.DataFine, v.VolantinoFile, v.IDVolantino, n.Nome as Negozio, n.Logo FROM volantino v, negozio n WHERE v.Negozio = n.IDNegozio AND n.IDNegozio = '" + Negozio + "'";
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Error");
+            res.send("Errore");
             return;
         };
         res.json(results);
@@ -216,12 +261,35 @@ app.get("/api/trovaVolantiniFiltroNegozio", (req, res) => {
 
 //Sconti
 
-app.get("/api/salvaSconto", (req, res) => {
-    
+app.post("/api/salvaSconto", (req, res) => {
+    var Valore = req.body.Valore;
+    var Negozio = req.body.Negozio;
+    var DataInizio = req.body.DataInizio;
+    var DataFine = req.body.DataFine;
+    sql = "INSERT INTO sconto (Valore, Negozio, DataInizio, DataFine) VALUES ('" + Valore + "','" + Negozio + "','" + DataInizio + "'" + DataFine + "')";
+    con.query(sql, function(err, results){
+        if(err){
+            console.log(err);
+            res.send("Errore");
+            return;
+        };
+        res.send("Aggiunto");
+        return;
+    });
 })
 
-app.get("/api/eliminaSconto", (req, res) => {
-    
+app.delete("/api/eliminaSconto", (req, res) => {
+    var IDSconto = req.body.IDSconto;
+    sql = "DELETE FROM sconto WHERE IDSconto = '" + IDSconto + "'";
+    con.query(sql, function(err, results){
+        if(err){
+            console.log(err);
+            res.send("Errore");
+            return;
+        };
+        res.send("Rimosso");
+        return;
+    });
 })
 
 app.get("/api/trovaTuttiSconti", (req, res) => {
@@ -229,7 +297,7 @@ app.get("/api/trovaTuttiSconti", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Error");
+            res.send("Errore");
             return;
         };
         res.json(results);
@@ -238,12 +306,12 @@ app.get("/api/trovaTuttiSconti", (req, res) => {
 })
 
 app.get("/api/trovaScontiFiltroNegozio", (req, res) => {
-    var negozio = req.query.Negozio;
-    sql = "SELECT s.Valore, s.IDSconto, n.IDNegozio, s.DataInizio, s.DataFine, n.Nome AS Negozio, n.Logo FROM sconto s, negozio n WHERE s.Negozio = n.IDNegozio AND n.IDNegozio = '" + negozio + "'";
+    var Negozio = req.query.Negozio;
+    sql = "SELECT s.Valore, s.IDSconto, n.IDNegozio, s.DataInizio, s.DataFine, n.Nome AS Negozio, n.Logo FROM sconto s, negozio n WHERE s.Negozio = n.IDNegozio AND n.IDNegozio = '" + Negozio + "'";
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Error");
+            res.send("Errore");
             return;
         };
         res.json(results);
@@ -251,16 +319,12 @@ app.get("/api/trovaScontiFiltroNegozio", (req, res) => {
     });
 })
 
-app.get("/api/trovaScontiFiltroCategoria", (req, res) => {
-    
-})
-
 app.get("/api/trovaScontiConCategoria", (req, res) => {
     sql = "SELECT s.Valore, s.IDSconto, n.IDNegozio, s.DataInizio, s.DataFine, n.Nome AS Negozio, n.Logo, vsc.CategoriaApplicabile AS Categoria FROM sconto s, negozio n, validita_sconto_categoria vsc WHERE s.Negozio = n.IDNegozio AND s.IDSconto = vsc.IDSconto";
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Error");
+            res.send("Errore");
             return;
         };
         res.json(results);
@@ -269,12 +333,12 @@ app.get("/api/trovaScontiConCategoria", (req, res) => {
 })
 
 app.get("/api/trovaScontiConCategoriaFiltroNegozio", (req, res) => {
-    var negozio = req.query.Negozio;
-    sql = "SELECT s.Valore, s.IDSconto, n.IDNegozio, s.DataInizio, s.DataFine, n.Nome AS Negozio, n.Logo, vsc.CategoriaApplicabile AS Categoria FROM sconto s, negozio n, validita_sconto_categoria vsc WHERE s.Negozio = n.IDNegozio AND s.IDSconto = vsc.IDSconto AND s.Negozio = '" + negozio + "'";
+    var Negozio = req.query.Negozio;
+    sql = "SELECT s.Valore, s.IDSconto, n.IDNegozio, s.DataInizio, s.DataFine, n.Nome AS Negozio, n.Logo, vsc.CategoriaApplicabile AS Categoria FROM sconto s, negozio n, validita_sconto_categoria vsc WHERE s.Negozio = n.IDNegozio AND s.IDSconto = vsc.IDSconto AND s.Negozio = '" + Negozio + "'";
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Error");
+            res.send("Errore");
             return;
         };
         res.json(results);
@@ -282,61 +346,103 @@ app.get("/api/trovaScontiConCategoriaFiltroNegozio", (req, res) => {
     });
 })
 
-
-app.get("/api/trovaScontiFiltroProdotto", (req, res) => {
-    
-})
-
-app.get("/api/trovaScontiFiltroValore", (req, res) => {
-    
-})
-
-//Negozi
-
-app.get("/api/salvaNegozio", (req, res) => {
-    
-})
-
-app.get("/api/eliminaNegozio", (req, res) => {
-    
-})
-
-app.get("/api/modificaOrario", (req, res) => {
-    
-})
-
-app.get("/api/modificaUbicazione", (req, res) => {
-    
-})
-
-app.post("/api/aggiungiRecensione", (req, res) => {
-    var Username = req.session.user;
-    var Titolo = req.body.Titolo;
-    var N_stelle = req.body.Stelle;
-    var Testo = req.body.Testo;
-    var Negozio = req.body.IDNegozio;
-    var sql = "INSERT INTO recensione (Titolo, Testo, N_stelle, Utente, Negozio) VALUES ('" + Titolo + "', '" + Testo + "', '" + N_stelle + "','" + Username + "','" + Negozio + "')";
+app.get("/api/trovaScontiConProdotto", (req, res) => {
+    sql = "SELECT s.Valore, s.IDSconto, n.IDNegozio, s.DataInizio, s.DataFine, n.Nome AS Negozio, n.Logo, vsp.prodotto AS IDProdotto FROM sconto s, negozio n, validita_sconto_prodotto vsp WHERE s.Negozio = n.IDNegozio AND s.IDSconto = vsp.Sconto";
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Error");
+            res.send("Errore");
             return;
         };
         res.json(results);
         return;
-    })
+    });
 })
 
-app.get("/api/aggiungiVolantino", (req, res) => {
-    
+app.get("/api/trovaScontiConProdottoFiltroNegozio", (req, res) => {
+    var Negozio = req.query.Negozio;
+    sql = "SELECT s.Valore, s.IDSconto, n.IDNegozio, s.DataInizio, s.DataFine, n.Nome AS Negozio, n.Logo, vsp.prodotto AS IDProdotto FROM sconto s, negozio n, validita_sconto_prodotto vsp WHERE s.Negozio = n.IDNegozio AND s.IDSconto = vsp.Sconto AND s.Negozio = '" + Negozio + "'";
+    con.query(sql, function(err, results){
+        if(err){
+            console.log(err);
+            res.send("Errore");
+            return;
+        };
+        res.json(results);
+        return;
+    });
 })
+
+//Negozi
+
+app.post("/api/salvaNegozio", (req, res) => {
+    var Ubicazione = req.body.Ubicazione;
+    var Orari = req.body.Orari;
+    var Nome = req.body.Nome;
+    var Logo = req.body.Logo;
+    sql = "INSERT INTO negozio (Ubicazione, Orari, Nome, Logo) VALUES ('" + Ubicazione + "','" + Orari + "','" + Nome + "'" + Logo + "')";
+    con.query(sql, function(err, results){
+        if(err){
+            console.log(err);
+            res.send("Errore");
+            return;
+        };
+        res.send("Aggiunto");
+        return;
+    });
+})
+
+app.delete("/api/eliminaNegozio", (req, res) => {
+    var IDNegozio = req.body.IDNegozio;
+    sql = "DELETE FROM negozio WHERE IDNegozio = '" + IDNegozio + "'";
+    con.query(sql, function(err, results){
+        if(err){
+            console.log(err);
+            res.send("Errore");
+            return;
+        };
+        res.send("Rimosso");
+        return;
+    });
+})
+
+app.patch("/api/modificaOrario", (req, res) => {
+    var IDNegozio = req.body.IDNegozio;
+    var Orario = req.body.Orario;
+    sql = "UPDATE negozio SET Orari = '" + Orario + "' WHERE IDNegozio = '" + IDNegozio + "'";
+    con.query(sql, function(err, results){
+        if(err){
+            console.log(err);
+            res.send("Errore");
+            return;
+        };
+        res.send("Aggiornato");
+        return;
+    });
+})
+
+app.patch("/api/modificaUbicazione", (req, res) => {
+    var IDNegozio = req.body.IDNegozio;
+    var Ubicazione = req.body.Ubicazione;
+    sql = "UPDATE negozio SET Ubicazione = '" + Ubicazione + "' WHERE IDNegozio = '" + IDNegozio + "'";
+    con.query(sql, function(err, results){
+        if(err){
+            console.log(err);
+            res.send("Errore");
+            return;
+        };
+        res.send("Aggiornato");
+        return;
+    });
+})
+
 
 app.get("/api/trovaTuttiNegozi", (req, res) => {
     sql = "SELECT * FROM negozio";
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Error");
+            res.send("Errore");
             return;
         };
         res.json(results);
@@ -345,11 +451,31 @@ app.get("/api/trovaTuttiNegozi", (req, res) => {
 })
 
 app.get("/api/trovaTuttiNegoziFiltroNome", (req, res) => {
-    
+    var Nome = req.query.Nome;
+    sql = "SELECT * FROM negozio WHERE Nome = '" + Nome + "'";
+    con.query(sql, function(err, results){
+        if(err){
+            console.log(err);
+            res.send("Errore");
+            return;
+        };
+        res.json(results);
+        return;
+    });
 })
 
-app.get("/api/trovaTuttiNegoziFiltroLocalità", (req, res) => {
-    
+app.get("/api/trovaTuttiNegoziFiltroUbicazione", (req, res) => {
+    var Ubicazione = req.query.Ubicazione;
+    sql = "SELECT * FROM negozio WHERE Ubicazione = '" + Ubicazione + "'";
+    con.query(sql, function(err, results){
+        if(err){
+            console.log(err);
+            res.send("Errore");
+            return;
+        };
+        res.json(results);
+        return;
+    });
 })
 
 app.get("/api/trovaNegozioFiltroID", (req, res) => {
@@ -358,7 +484,7 @@ app.get("/api/trovaNegozioFiltroID", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Error");
+            res.send("Errore");
             return;
         };
         res.json(results);
@@ -368,20 +494,65 @@ app.get("/api/trovaNegozioFiltroID", (req, res) => {
 
 //Prodotti
 
-app.get("/api/salvaProdotto", (req, res) => {
-    
+app.post("/api/salvaProdotto", (req, res) => {
+    var Nome = req.body.Nome;
+    var Immagine = req.body.Immagine;
+    var Categoria = req.body.Categoria;
+    var IDNegozio = req.body.IDNegozio;
+    sql = "INSERT INTO prodotto (Nome, Immagine, Categoria, IDNegozio) VALUES ('" + Nome + "','" + Immagine + "','" + Categoria + "'" + IDNegozio + "')";
+    con.query(sql, function(err, results){
+        if(err){
+            console.log(err);
+            res.send("Errore");
+            return;
+        };
+        res.send("Aggiunto");
+        return;
+    });
 })
 
-app.get("/api/eliminaProdotto", (req, res) => {
-    
+app.delete("/api/eliminaProdotto", (req, res) => {
+    var IDProdotto = req.body.IDProdotto;
+    sql = "DELETE FROM prodotto WHERE IDProdotto = '" + IDProdotto + "'";
+    con.query(sql, function(err, results){
+        if(err){
+            console.log(err);
+            res.send("Errore");
+            return;
+        };
+        res.send("Rimosso");
+        return;
+    });
 })
 
-app.get("/api/modificaImmagine", (req, res) => {
-    
+app.patch("/api/modificaImmagine", (req, res) => {
+    var IDProdotto = req.body.IDProdotto;
+    var Immagine = req.body.Immagine;
+    sql = "UPDATE prodotto SET Immagine = '" + Immagine + "' WHERE IDProdotto = '" + IDProdotto + "'";
+    con.query(sql, function(err, results){
+        if(err){
+            console.log(err);
+            res.send("Errore");
+            return;
+        };
+        res.send("Aggiornato");
+        return;
+    });
 })
 
-app.get("/api/aggiungiPrezzo", (req, res) => {
-    
+app.post("/api/aggiungiPrezzo", (req, res) => {
+    var Prodotto = req.body.Prodotto;
+    var Prezzo = req.body.Prezzo;
+    sql = "INSERT INTO storicoprezzi (Prodotto, Prezzo) VALUES ('" + Prodotto + "','" + Prezzo + "')";
+    con.query(sql, function(err, results){
+        if(err){
+            console.log(err);
+            res.send("Errore");
+            return;
+        };
+        res.send("Aggiunto");
+        return;
+    });
 })
 
 app.get("/api/trovaTuttiProdotti", (req, res) => {
@@ -389,7 +560,7 @@ app.get("/api/trovaTuttiProdotti", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Error");
+            res.send("Errore");
             return;
         };
         res.json(results);
@@ -402,7 +573,7 @@ app.get("/api/trovaTuttiProdottiScontati", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Error");
+            res.send("Errore");
             return;
         };
         res.json(results);
@@ -417,7 +588,7 @@ app.get("/api/trovaTuttiProdottiScontatiFiltroCategoria", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Error");
+            res.send("Errore");
             return;
         };
         res.json(results);
@@ -426,7 +597,17 @@ app.get("/api/trovaTuttiProdottiScontatiFiltroCategoria", (req, res) => {
 })
 
 app.get("/api/trovaProdottiFiltroNome", (req, res) => {
-
+    var Nome = req.query.Nome;
+    var sql = "SELECT DISTINCT p.Nome, p.Immagine, p.Categoria, p.IDProdotto, n.Nome as Negozio, sp.Prezzo  FROM prodotto p, storicoprezzi sp, negozio n WHERE p.IDProdotto = sp.Prodotto AND p.NegozioProvenienza = n.IDNegozio AND p.Nome = '" + Nome + "' GROUP BY p.IDProdotto HAVING MAX(sp.Data)"
+    con.query(sql, function(err, results){
+        if(err){
+            console.log(err);
+            res.send("Errore");
+            return;
+        };
+        res.json(results);
+        return;
+    })
 })
 
 app.get("/api/trovaProdottoFiltroID", (req, res) => {
@@ -435,7 +616,7 @@ app.get("/api/trovaProdottoFiltroID", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Error");
+            res.send("Errore");
             return;
         };
         res.json(results);
@@ -444,7 +625,17 @@ app.get("/api/trovaProdottoFiltroID", (req, res) => {
 })
 
 app.get("/api/trovaProdottiFiltroNegozio", (req, res) => {
-    
+    var IDNegozio = req.query.IDNegozio;
+    var sql = "SELECT DISTINCT p.Nome, p.Immagine, p.Categoria, p.IDProdotto, n.Nome as Negozio, sp.Prezzo  FROM prodotto p, storicoprezzi sp, negozio n WHERE p.IDProdotto = sp.Prodotto AND p.NegozioProvenienza = n.IDNegozio AND p.NegozioProvenienza = '" + Negozio + "' GROUP BY p.IDProdotto HAVING MAX(sp.Data)"
+    con.query(sql, function(err, results){
+        if(err){
+            console.log(err);
+            res.send("Errore");
+            return;
+        };
+        res.json(results);
+        return;
+    })
 })
 
 app.get("/api/trovaProdottiFiltroCategoria", (req, res) => {
@@ -453,7 +644,7 @@ app.get("/api/trovaProdottiFiltroCategoria", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Error");
+            res.send("Errore");
             return;
         };
         res.json(results);
@@ -463,42 +654,110 @@ app.get("/api/trovaProdottiFiltroCategoria", (req, res) => {
 
 //Utente
 
-app.get("/api/salvaUtente", (req, res) => {
-    
-})
+//salvaUtente rimosso poichè equivale a /login
 
-app.get("/api/eliminaUtente", (req, res) => {
-    
+function checkAdmin(Username){
+    var sql = "SELECT * FROM utente_registrato WHERE Username = '" + Username + "' AND isAdmin = 'true'";
+    con.query(sql, function(err, results){
+        if(err){
+            console.log(err);
+            res.send("Errore");
+            return;
+        };
+        if(results != null){
+            return true;
+        }
+        else{
+            return false;
+        }
+    })
+}
+
+app.delete("/api/eliminaUtente", (req, res) => {
+    var User = req.session.user;
+    if(checkAdmin(User)){
+        var Username = req.body.Username;
+        sql = "DELETE FROM utente_registrato WHERE Username = '" + Username + "'";
+        con.query(sql, function(err, results){
+            if(err){
+                console.log(err);
+                res.send("Errore");
+                return;
+            };
+            res.send("Rimosso");
+            return;
+        });
+    }
 })
 
 app.get("/api/ripristinoPassword", (req, res) => {
-    
+    //Usa GMail
 })
 
-app.get("/api/eliminaUtente", (req, res) => {
-    
+app.patch("/api/modificaPassword", (req, res) => {
+    var User = req.session.user;
+    if(checkAdmin(User) || User == req.body.Username){
+        var Username = req.body.Username;
+        var PasswordNuova = req.body.PasswordNuova;
+        sql = "UPDATE utente_registrato SET Password = '" + PasswordNuova + "' WHERE Username = '" + Username + "'";
+        con.query(sql, function(err, results){
+            if(err){
+                console.log(err);
+                res.send("Errore");
+                return;
+            };
+            res.send("Aggiornato");
+            return;
+        });
+    }
 })
 
-app.get("/api/modificaPassword", (req, res) => {
-    
+app.patch("/api/modificaNumeroTelefono", (req, res) => {
+    var User = req.session.user;
+    if(checkAdmin(User) || User == req.body.Username){
+        var Username = req.body.Username;
+        var TelefonoNuovo = req.body.TelefonoNuovo;
+        sql = "UPDATE utente_registrato SET Telefono = '" + TelefonoNuovo + "' WHERE Username = '" + Username + "'";
+        con.query(sql, function(err, results){
+            if(err){
+                console.log(err);
+                res.send("Errore");
+                return;
+            };
+            res.send("Aggiornato");
+            return;
+        });
+    }
 })
 
-app.get("/api/modificaNumeroTelefono", (req, res) => {
-    
+app.patch("/api/modificaFotoProfilo", (req, res) => {
+    var User = req.session.user;
+    if(checkAdmin(User) || User == req.body.Username){
+        var Username = req.body.Username;
+        var FotoProfilo = req.body.FotoProfilo;
+        sql = "UPDATE utente_registrato SET FotoProfilo = '" + FotoProfilo + "' WHERE Username = '" + Username + "'";
+        con.query(sql, function(err, results){
+            if(err){
+                console.log(err);
+                res.send("Errore");
+                return;
+            };
+            res.send("Aggiornato");
+            return;
+        });
+    }
 })
 
-app.get("/api/modificaFotoProfilo", (req, res) => {
-    
-})
-
-app.get("/api/aggiungiProdottoAiPreferiti", (req, res) => {
+app.post("/api/aggiungiProdottoAiPreferiti", (req, res) => {
     var Username = req.session.user;
-    var IDProdotto = req.query.IDProdotto;
+    var IDProdotto = req.body.IDProdotto;
+    console.log("body:");
+    console.log(req.body);
     var sql = "INSERT INTO prodottipreferiti (Prodotto, Utente) VALUES ('" + IDProdotto + "', '" + Username + "')";
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Error");
+            res.send("Errore");
             return;
         };
         res.json(results);
@@ -506,14 +765,16 @@ app.get("/api/aggiungiProdottoAiPreferiti", (req, res) => {
     })
 })
 
-app.get("/api/rimuoviProdottoDaiPreferiti", (req, res) => {
+app.delete("/api/rimuoviProdottoDaiPreferiti", (req, res) => {
     var Username = req.session.user;
-    var IDProdotto = req.query.IDProdotto;
+    var IDProdotto = req.body.IDProdotto;
+    console.log("body remove:");
+    console.log(req.body);
     var sql = "DELETE FROM prodottipreferiti WHERE Prodotto = '" + IDProdotto + "' AND Utente = '" + Username + "'";
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Error");
+            res.send("Errore");
             return;
         };
         res.json(results);
@@ -521,14 +782,14 @@ app.get("/api/rimuoviProdottoDaiPreferiti", (req, res) => {
     })
 })
 
-app.get("/api/aggiungiNegozioAiPreferiti", (req, res) => {
+app.post("/api/aggiungiNegozioAiPreferiti", (req, res) => {
     var Username = req.session.user;
-    var IDNegozio = req.query.IDNegozio;
+    var IDNegozio = req.body.IDNegozio;
     var sql = "INSERT INTO negozipreferiti (Negozio, Utente) VALUES ('" + IDNegozio + "', '" + Username + "')";
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Error");
+            res.send("Errore");
             return;
         };
         res.json(results);
@@ -536,14 +797,14 @@ app.get("/api/aggiungiNegozioAiPreferiti", (req, res) => {
     })
 })
 
-app.get("/api/rimuoviNegozioDaiPreferiti", (req, res) => {
+app.delete("/api/rimuoviNegozioDaiPreferiti", (req, res) => {
     var Username = req.session.user;
-    var IDNegozio = req.query.IDNegozio;
+    var IDNegozio = req.body.IDNegozio;
     var sql = "DELETE FROM negozipreferiti WHERE Negozio = '" + IDNegozio + "' AND Utente = '" + Username + "'";
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Error");
+            res.send("Errore");
             return;
         };
         res.json(results);
@@ -552,16 +813,39 @@ app.get("/api/rimuoviNegozioDaiPreferiti", (req, res) => {
 })
 
 app.get("/api/ottieniDatiUtente", (req, res) => {
-    
+    var User = req.session.user;
+    if(checkAdmin(User)){
+        var Username = req.query.Username;
+        sql = "SELECT * FROM utente_registrato WHERE Username = '" + Username + "'";
+        con.query(sql, function(err, results){
+            if(err){
+                console.log(err);
+                res.send("Errore");
+                return;
+            };
+            res.send(results);
+            return;
+        });
+    }
 })
 
 app.get("/api/trovaTuttiUtenti", (req, res) => {
-    
+    var User = req.session.user;
+    if(checkAdmin(User)){
+        sql = "SELECT * FROM utente_registrato";
+        con.query(sql, function(err, results){
+            if(err){
+                console.log(err);
+                res.send("Errore");
+                return;
+            };
+            res.send(results);
+            return;
+        });
+    }
 })
 
-app.get("/api/trovaTuttiUtentiNome", (req, res) => {
-    
-})
+//trovaTuttiUtentiNome fa la stessa azione di ottieniDatiUtente, rimosso.
 
 
 app.get("/api/ottieniProdottiPreferiti", (req, res) => {
@@ -571,7 +855,7 @@ app.get("/api/ottieniProdottiPreferiti", (req, res) => {
         con.query(sql, function(err, results){
             if(err){
                 console.log(err);
-                res.send("Error");
+                res.send("Errore");
                 return;
             };
             res.json(results);
@@ -591,7 +875,7 @@ app.get("/api/checkProdottoPreferito", (req, res) => {
         con.query(sql, function(err, results){
             if(err){
                 console.log(err);
-                res.send("Error");
+                res.send("Errore");
                 return;
             };
             res.json(results);
@@ -610,7 +894,7 @@ app.get("/api/ottieniNegoziPreferiti", (req, res) => {
         con.query(sql, function(err, results){
             if(err){
                 console.log(err);
-                res.send("Error");
+                res.send("Errore");
                 return;
             };
             res.json(results);
@@ -630,7 +914,7 @@ app.get("/api/checkNegozioPreferito", (req, res) => {
         con.query(sql, function(err, results){
             if(err){
                 console.log(err);
-                res.send("Error");
+                res.send("Errore");
                 return;
             };
             res.json(results);
@@ -644,33 +928,77 @@ app.get("/api/checkNegozioPreferito", (req, res) => {
 
 //Recensione
 
-app.get("/api/salvaRecensione", (req, res) => {
-    
+app.post("/api/salvaRecensione", (req, res) => {
+    if(req.session.user != null){
+        var Username = req.session.user;
+        var Titolo = req.body.Titolo;
+        var N_stelle = req.body.Stelle;
+        var Testo = req.body.Testo;
+        var Negozio = req.body.IDNegozio;
+        var sql = "INSERT INTO recensione (Titolo, Testo, N_stelle, Data_creazione, Utente, Negozio) VALUES ('" + Titolo + "', '" + Testo + "', '" + N_stelle + "','" + "getdate()" + "','" + Username + "','" + Negozio + "')";
+        con.query(sql, function(err, results){
+            if(err){
+                console.log(err);
+                res.send("Errore");
+                return;
+            };
+            res.json(results);
+            return;
+        })
+    }
+    else{
+        res.send("Richiesta inviata senza aver effettuato il login");
+    }
 })
 
-app.get("/api/eliminaRecensione", (req, res) => {
-    
+app.delete("/api/eliminaRecensione", (req, res) => {
+    if(req.session.user != null){
+        var User = req.session.user;
+        if(checkAdmin(User) || User == req.body.Username){
+            var IDRecensione = req.body.IDRecensione;
+            var sql = "DELETE FROM recensione WHERE IDRecensione = '" + IDRecensione + "'";
+            con.query(sql, function(err, results){
+                if(err){
+                    console.log(err);
+                    res.send("Errore");
+                    return;
+                };
+                res.json(results);
+                return;
+            })
+        }
+        else{
+            res.send("Permessi insufficenti");
+        }
+    }
+    else{
+        res.send("Richiesta inviata senza aver effettuato il login");
+    }
 })
 
-app.get("/api/oscuraTesto", (req, res) => {
-    
-})
-
-app.get("/api/oscuraTuttoTesto", (req, res) => {
-    
-})
+//oscuraTesto difficilissimo da implementare
 
 app.get("/api/trovaRecensioniFiltroUtente", (req, res) => {
-    
-})
-
-app.get("/api/trovaRecensioniFiltroNegozio", (req, res) => {
-    var negozio = req.query.IDNegozio;
-    sql = "SELECT r.Titolo, r.Testo, r.N_stelle, r.Data_creazione, r.Utente AS Nome, r.IDRecensione, u.FotoProfilo FROM recensione r, utente_registrato u WHERE r.Utente = u.Username AND r.Negozio = '" + negozio + "'";
+    var Username = req.query.Username;
+    sql = "SELECT r.Titolo, r.Testo, r.N_stelle, r.Data_creazione, r.Utente AS Nome, r.IDRecensione, u.FotoProfilo, n.Nome, n.IDNegozio as Negozio FROM recensione r, utente_registrato u, negozio n WHERE r.Negozio = n.IDNegozio AND r.Utente = u.Username AND r.Utente = '" + Username + "'";
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Error");
+            res.send("Errore");
+            return;
+        };
+        res.json(results);
+        return;
+    });
+})
+
+app.get("/api/trovaRecensioniFiltroNegozio", (req, res) => {
+    var Negozio = req.query.IDNegozio;
+    sql = "SELECT r.Titolo, r.Testo, r.N_stelle, r.Data_creazione, r.Utente AS Nome, r.IDRecensione, u.FotoProfilo, n.Nome AS Negozio, n.IDNegozio FROM recensione r, utente_registrato u, negozio n WHERE r.Negozio = n.IDNegozio AND r.Utente = u.Username AND r.Negozio = '" + Negozio + "'";
+    con.query(sql, function(err, results){
+        if(err){
+            console.log(err);
+            res.send("Errore");
             return;
         };
         res.json(results);
@@ -679,13 +1007,22 @@ app.get("/api/trovaRecensioniFiltroNegozio", (req, res) => {
 })
 
 app.get("/api/trovaTutteRecensioni", (req, res) => {
-    
+    var sql = "SELECT r.Titolo, r.Testo, r.N_stelle, r.Data_creazione, r.Utente AS Nome, r.IDRecensione, u.FotoProfilo, n.Nome AS Negozio, n.IDNegozio FROM recensione r, utente_registrato u, negozio n WHERE r.Negozio = n.IDNegozio AND r.Utente = u.Username";
+    con.query(sql, function(err, results){
+        if(err){
+            console.log(err);
+            res.send("Errore");
+            return;
+        };
+        res.json(results);
+        return;
+    });
 })
 
 //Mail
 
 app.get("/api/inviaMail", (req, res) => {
-    
+    //GMail API
 })
 
 //Categoria
@@ -695,7 +1032,7 @@ app.get("/api/categorie", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Error");
+            res.send("Errore");
             return;
         };
         res.json(results);

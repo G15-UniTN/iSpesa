@@ -166,15 +166,31 @@
         function aggiungiPreferiti(){
             if(Username != null && Username != ""){
                 if(preferito){
-                    var request = "/api/rimuoviProdottoDaiPreferiti?IDProdotto=" + IDProdotto;
-                    fetch(url_sito + request)
+                    var request = "/api/rimuoviProdottoDaiPreferiti";
+                    fetch(url_sito + request, {
+                        method: "DELETE",
+                        body: JSON.stringify({
+                            IDProdotto: IDProdotto
+                        }),
+                        headers: {
+                            "Content-type": "application/json; charset=UTF-8"
+                        }
+                    })
                     .then(response => response.json())
                     document.getElementById("Stella").src = "/img/sito/stella.webp";
                     preferito = false;
                 }
                 else{
-                    var request = "/api/aggiungiProdottoAiPreferiti?IDProdotto=" + IDProdotto;
-                    fetch(url_sito + request)
+                    var request = "/api/aggiungiProdottoAiPreferiti";
+                    fetch(url_sito + request, {
+                        method: "POST",
+                        body: JSON.stringify({
+                            IDProdotto: IDProdotto
+                        }),
+                        headers: {
+                            "Content-type": "application/json; charset=UTF-8"
+                        }
+                    })
                     .then(response => response.json())
                     document.getElementById("Stella").src = "/img/sito/stella_gialla.png";
                     preferito = true;
