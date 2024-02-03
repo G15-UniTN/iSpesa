@@ -1,7 +1,6 @@
 const path = require("path");
 const fs = require("fs");
 const express = require ("express");
-const app = express();
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');
 const hbs = require("hbs");
@@ -19,6 +18,7 @@ const swaggerOptions ={
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 const methodOverride = require('method-override');
 
+const app = express();
 app.use(express.static(path.join(__dirname, "public")));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 app.use(express.json());
@@ -26,8 +26,6 @@ app.use(methodOverride('_method'));
 app.set("view engine", "hbs");
 app.set("views", path.join(__dirname, "views"));
 hbs.registerPartials(__dirname + "/views/partials");
-
-const port = 8080;
 
 var con = mysql.createConnection({
     host: "localhost",
@@ -45,6 +43,15 @@ app.use(session({
     saveUninitialized : false,
     secret: 'iSpesa segreto'
 }));
+
+var shutting_down = false;
+app.use(function (req, resp, next) {
+    if(!shutting_down)
+      return next();
+   
+    resp.setHeader('Connection', "close");
+    resp.send(503, "Server is in the process of closing");
+});
 
 app.use((req, res, next) => {
     var now = new Date().toString();
@@ -1133,13 +1140,20 @@ app.get("/api/categorie", (req, res) => {
             res.send("Errore");
             return;
         };
+        res.status(200);
         res.json(results);
         return;
     });
 })
 
+function closeDB(){
+    con.end((error) => {
+        if(error){
+            console.error('Error closing MySQL connection:', error);
+            return;
+        }
+    });
+}
 
-
-app.listen(port, () => {
-    console.log("Server is listening on port " + port);
-});
+module.exports.app = app;
+module.exports.closeDB = closeDB;
