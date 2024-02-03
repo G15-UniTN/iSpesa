@@ -126,10 +126,33 @@ app.get("/preferiti", (req, res) => {
 
 app.get("/area_personale", (req, res) => {
     if(req.session.user != null){
-        res.render("area_personale.hbs", { title: 'user', user: req.session.user, title: 'header', header: 'header_loggato'});
+        if(req.session.isAdmin){
+            res.render("area_personale.hbs", { title: 'user', user: req.session.user, title: 'header', header: 'header_loggato', title: 'admin', admin: 'admin_settings'});
+        }
+        else{
+            res.render("area_personale.hbs", { title: 'user', user: req.session.user, title: 'header', header: 'header_loggato', title: 'admin', admin: 'none'});
+        }
     }
     else{
-        res.render("area_personale.hbs", { title: 'header', header: 'header'});
+        res.redirect("/");
+    };
+})
+
+app.get("/admin_utenti", (req, res) => {
+    if(req.session.isAdmin){
+        res.render("admin_utenti.hbs", { title: 'header', header: 'header_loggato'});
+    }
+    else{
+        res.redirect("/");
+    };
+})
+
+app.get("/admin_recensioni", (req, res) => {
+    if(req.session.isAdmin){
+        res.render("admin_recensioni.hbs", { title: 'header', header: 'header_loggato'});
+    }
+    else{
+        res.redirect("/");
     };
 })
 
@@ -163,6 +186,12 @@ app.post("/login", (req, res) => {
             if(result.length > 0){
                 req.session.regenerate(function(){
                     req.session.user = username;
+                    if(result[0].isAdmin){
+                        req.session.isAdmin = true;
+                    }
+                    else{
+                        req.session.isAdmin = false;
+                    }
                     res.redirect("/");
                     return;
                 })
@@ -668,26 +697,9 @@ app.get("/api/trovaProdottiFiltroCategoria", (req, res) => {
 
 //salvaUtente rimosso poichè equivale a /login
 
-function checkAdmin(Username){
-    var sql = "SELECT * FROM utente_registrato WHERE Username = '" + Username + "' AND isAdmin = 'true'";
-    con.query(sql, function(err, results){
-        if(err){
-            console.log(err);
-            res.send("Errore");
-            return;
-        };
-        if(results != null){
-            return true;
-        }
-        else{
-            return false;
-        }
-    })
-}
-
 app.delete("/api/eliminaUtente", (req, res) => {
     var User = req.session.user;
-    if(checkAdmin(User)){
+    if(req.session.isAdmin){
         var Username = req.body.Username;
         sql = "DELETE FROM utente_registrato WHERE Username = '" + Username + "'";
         con.query(sql, function(err, results){
@@ -696,7 +708,8 @@ app.delete("/api/eliminaUtente", (req, res) => {
                 res.send("Errore");
                 return;
             };
-            res.send("Rimosso");
+            res.status(200);
+            res.redirect('back');
             return;
         });
     }
@@ -706,9 +719,30 @@ app.get("/api/ripristinoPassword", (req, res) => {
     //Usa GMail
 })
 
+app.patch("/api/attiva2AF", (req, res) => {
+    //Usa auth0
+    var User = req.session.user;
+    if(User == req.body.Username){
+        var Username = req.body.Username;
+        var EmailNuova = req.body.Email;
+        sql = "UPDATE utente_registrato SET 2AF_attiva = '" + 1 + "' WHERE Username = '" + Username + "'";
+        con.query(sql, function(err, results){
+            if(err){
+                console.log(err);
+                res.send("Errore");
+                return;
+            };
+            res.status(200);
+            res.redirect('back');
+            return;
+        });
+    }
+})
+
+
 app.patch("/api/modificaPassword", (req, res) => {
     var User = req.session.user;
-    if(checkAdmin(User) || User == req.body.Username){
+    if(req.session.isAdmin || User == req.body.Username){
         var Username = req.body.Username;
         var PasswordVecchia = req.body.PasswordVecchia;
         var PasswordNuova = req.body.Password;
@@ -746,7 +780,7 @@ app.patch("/api/modificaPassword", (req, res) => {
 
 app.patch("/api/modificaEmail", (req, res) => {
     var User = req.session.user;
-    if(checkAdmin(User) || User == req.body.Username){
+    if(req.session.isAdmin || User == req.body.Username){
         var Username = req.body.Username;
         var EmailNuova = req.body.Email;
         sql = "UPDATE utente_registrato SET Email = '" + EmailNuova + "' WHERE Username = '" + Username + "'";
@@ -765,7 +799,7 @@ app.patch("/api/modificaEmail", (req, res) => {
 
 app.patch("/api/modificaNumeroTelefono", (req, res) => {
     var User = req.session.user;
-    if(checkAdmin(User) || User == req.body.Username){
+    if(req.session.isAdmin || User == req.body.Username){
         var Username = req.body.Username;
         var TelefonoNuovo = req.body.Telefono;
         sql = "UPDATE utente_registrato SET Telefono = '" + TelefonoNuovo + "' WHERE Username = '" + Username + "'";
@@ -776,7 +810,7 @@ app.patch("/api/modificaNumeroTelefono", (req, res) => {
                 return;
             };
             res.status(200);
-            res.send('back');
+            res.redirect('back');
             return;
         });
     }
@@ -784,7 +818,7 @@ app.patch("/api/modificaNumeroTelefono", (req, res) => {
 
 app.patch("/api/modificaFotoProfilo", (req, res) => {
     var User = req.session.user;
-    if(checkAdmin(User) || User == req.body.Username){
+    if(req.session.isAdmin || User == req.body.Username){
         var Username = req.body.Username;
         var FotoProfilo = req.body.FotoProfilo;
         sql = "UPDATE utente_registrato SET FotoProfilo = '" + FotoProfilo + "' WHERE Username = '" + Username + "'";
@@ -794,7 +828,8 @@ app.patch("/api/modificaFotoProfilo", (req, res) => {
                 res.send("Errore");
                 return;
             };
-            res.send("Aggiornato");
+            res.status(200);
+            res.redirect('back');
             return;
         });
     }
@@ -866,9 +901,9 @@ app.delete("/api/rimuoviNegozioDaiPreferiti", (req, res) => {
 
 app.get("/api/ottieniDatiUtente", (req, res) => {
     var User = req.session.user;
-    if(checkAdmin(User) || req.query.Username == User){
+    if(req.session.isAdmin || req.query.Username == User){
         var Username = req.query.Username;
-        sql = "SELECT * FROM utente_registrato WHERE Username = '" + Username + "'";
+        sql = "SELECT Username, FotoProfilo, 2AF_attiva AS TFA_attiva, Email, Bloccato, Telefono, Password, isAdmin FROM utente_registrato WHERE Username = '" + Username + "'";
         con.query(sql, function(err, results){
             if(err){
                 console.log(err);
@@ -886,8 +921,8 @@ app.get("/api/ottieniDatiUtente", (req, res) => {
 
 app.get("/api/trovaTuttiUtenti", (req, res) => {
     var User = req.session.user;
-    if(checkAdmin(User)){
-        sql = "SELECT * FROM utente_registrato";
+    if(req.session.isAdmin){
+        sql = "SELECT Username, FotoProfilo, 2AF_attiva AS TFA_attiva, Email, Bloccato, Telefono, Password, isAdmin FROM utente_registrato";
         con.query(sql, function(err, results){
             if(err){
                 console.log(err);
@@ -897,6 +932,9 @@ app.get("/api/trovaTuttiUtenti", (req, res) => {
             res.send(results);
             return;
         });
+    }
+    else{
+        res.send("Privilegi insufficenti");
     }
 })
 
@@ -1014,7 +1052,7 @@ app.post("/api/salvaRecensione", (req, res) => {
 app.delete("/api/eliminaRecensione", (req, res) => {
     if(req.session.user != null){
         var User = req.session.user;
-        if(checkAdmin(User) || User == req.body.Username){
+        if(req.session.isAdmin || User == req.body.Username){
             var IDRecensione = req.body.IDRecensione;
             var sql = "DELETE FROM recensione WHERE IDRecensione = '" + IDRecensione + "'";
             con.query(sql, function(err, results){
