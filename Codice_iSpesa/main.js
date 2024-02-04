@@ -430,8 +430,6 @@ app.get("/api/trovaTuttiVolantini", (req, res) => {
  *      responses:
  *          200:
  *              description: OK. Si ottengono correttamente tutti i Volantini associati al Negozio.
- *          404:
- *              description: NOT FOUND. Nessun volantino presente nel sistema associato al Negozio.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -485,9 +483,11 @@ app.get("/api/trovaVolantiniFiltroNegozio", (req, res) => {
  *                  example: 2024-03-04
  *      responses:
  *          201:
- *              description: Created. Sconto creato correttamente e salvato.
- *          409:
- *              description: CONFLICT. Errore in seguito all'inserimento di un IDSconto già presente.
+ *              description: CREATED. Sconto creato correttamente e salvato.
+ *          400:
+ *              description: BAD REQUEST. Errore nel caso in cui i dati dello Sconto non siano validi.
+ *          403:
+ *              description: FORBIDDEN. Errore nel caso in cui un Utente non Amministratore provi a salvare uno Sconto.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -532,8 +532,8 @@ app.post("/api/salvaSconto", (req, res) => {
  *      responses:
  *          204:
  *              description: NO CONTENT. Sconto eliminato correttamente e nessun ritorno dall'API.
- *          404:
- *              description: NOT FOUND. Nessuno Sconto con tale ID presente nel sistema.
+ *          403:
+ *              description: FORBIDDEN. Errore nel caso in cui un Utente non Amministratore provi a salvare uno Sconto.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */ 
@@ -569,8 +569,6 @@ app.delete("/api/eliminaSconto", (req, res) => {
  *      responses:
  *          200:
  *              description: OK. Si ottengono correttamente tutti gli Sconti.
- *          404:
- *              description: NOT FOUND. Nessuno Sconto presente nel sistema.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -597,8 +595,6 @@ app.get("/api/trovaTuttiSconti", (req, res) => {
  *      responses:
  *          200:
  *              description: OK. Si ottengono correttamente tutti gli Sconti e la categoria associata.
- *          404:
- *              description: NOT FOUND. Nessuno Sconto presente nel sistema.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -630,8 +626,6 @@ app.get("/api/trovaScontiConCategoria", (req, res) => {
  *      responses:
  *          200:
  *              description: OK. Si ottengono correttamente tutti gli Sconti associati al Negozio e la loro relativa categoria.
- *          404:
- *              description: NOT FOUND. Nessuno Sconto presente nel sistema associato al Negozio.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -659,8 +653,6 @@ app.get("/api/trovaScontiConCategoriaFiltroNegozio", (req, res) => {
  *      responses:
  *          200:
  *              description: OK. Si ottengono correttamente tutti gli Sconti e  i prodotti associati.
- *          404:
- *              description: NOT FOUND. Nessuno Sconto presente nel sistema.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -692,8 +684,6 @@ app.get("/api/trovaScontiConProdotto", (req, res) => {
  *      responses:
  *          200:
  *              description: OK. Si ottengono correttamente tutti gli Sconti associati al Negozio e i rispettivi prodotti.
- *          404:
- *              description: NOT FOUND. Nessuno Sconto presente nel sistema associato al Negozio.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -745,9 +735,11 @@ app.get("/api/trovaScontiConProdottoFiltroNegozio", (req, res) => {
  *                  example: 08:00 - 20:00
  *      responses:
  *          201:
- *              description: Created. Sconto creato correttamente e salvato.
- *          409:
- *              description: CONFLICT. Errore in seguito all'inserimento di un IDSconto già presente.
+ *              description: CREATED. Sconto creato correttamente e salvato.
+ *          400:
+ *              description: BAD REQUEST. Errore inviato nel caso in cui i dati del Negozio siano non validi.
+ *          403:
+ *              description: FORBIDDEN. Errore nel caso in cui un Utente non Amministratore provi a salvare un Negozio.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -792,8 +784,10 @@ app.post("/api/salvaNegozio", (req, res) => {
  *      responses:
  *          204:
  *              description: NO CONTENT. Negozio eliminato correttamente e nessun ritorno dall'API.
- *          404:
- *              description: NOT FOUND. Nessun Negozio con tale ID presente nel sistema.
+ *          400:
+ *              description: BAD REQUEST. Errore nel caso in cui l'ID del Negozio non sia valido.
+ *          403:
+ *              description: FORBIDDEN. Errore nel caso in cui un Utente non Amministratore provi ad eliminare un Negozio.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */ 
@@ -838,8 +832,10 @@ app.delete("/api/eliminaNegozio", (req, res) => {
  *      responses:
  *          204:
  *              description: NO CONTENT. Orario modificato con successo e nessun ritorno dall'API.
- *          404:
- *              description: NOT FOUND. Nessun Negozio con tale ID presente nel sistema.
+ *          400:
+ *              description: BAD REQUEST. Errore nel caso in cui i dati non siano validi.
+ *          403:
+ *              description: FORBIDDEN. Errore nel caso in cui un Utente non Amministratore provi a modificare l'orario di un Negozio.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */ 
@@ -885,11 +881,13 @@ app.patch("/api/modificaOrari", (req, res) => {
  *      responses:
  *          204:
  *              description: NO CONTENT. Ubicazione modificata con successo e nessun ritorno dall'API.
- *          404:
- *              description: NOT FOUND. Nessun Negozio con tale ID presente nel sistema.
+ *          400:
+ *              description: BAD REQUEST. Errore nel caso in cui i dati non siano validi.
+ *          403:
+ *              description: FORBIDDEN. Errore nel caso in cui un Utente non Amministratore provi a modificare l'ubicazione di un Negozio.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
- */ 
+ */  
 app.patch("/api/modificaUbicazione", (req, res) => {
     var IDNegozio = req.body.IDNegozio;
     var Ubicazione = req.body.Ubicazione;
@@ -923,8 +921,6 @@ app.patch("/api/modificaUbicazione", (req, res) => {
  *      responses:
  *          200:
  *              description: OK. Si ottengono correttamente tutti i Negozi.
- *          404:
- *              description: NOT FOUND. Nessun Negozio presente nel sistema.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -956,8 +952,6 @@ app.get("/api/trovaTuttiNegozi", (req, res) => {
  *      responses:
  *          200:
  *              description: OK. Si ottengono correttamente tutti i Negozi con il nome desiderato.
- *          404:
- *              description: NOT FOUND. Nessun Negozio presente nel sistema con il nome desiderato.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -990,8 +984,6 @@ app.get("/api/trovaTuttiNegoziFiltroNome", (req, res) => {
  *      responses:
  *          200:
  *              description: OK. Si ottengono correttamente tutti i Negozi con l'ubicazione desiderata.
- *          404:
- *              description: NOT FOUND. Nessun Negozio presente nel sistema con l'ubicazione desiderata.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -1024,8 +1016,6 @@ app.get("/api/trovaTuttiNegoziFiltroUbicazione", (req, res) => {
  *      responses:
  *          200:
  *              description: OK. Si ottiene correttamente il Negozio con l'ID desiderato.
- *          404:
- *              description: NOT FOUND. Nessun Negozio presente nel sistema con l'ID desiderato.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -1077,9 +1067,11 @@ app.get("/api/trovaNegozioFiltroID", (req, res) => {
  *                  example: 1
  *      responses:
  *          201:
- *              description: Created. Prodotto creato correttamente e salvato.
- *          409:
- *              description: CONFLICT. Errore in seguito all'inserimento di un Prodotto già presente.
+ *              description: CREATED. Prodotto creato correttamente e salvato.
+ *          400:
+ *              description: BAD REQUEST. Errore nel caso in cui i dati non siano validi.
+ *          403:
+ *              description: FORBIDDEN. Errore nel caso in cui un Utente non Amministratore provi a salvare un Prodotto.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -1124,8 +1116,8 @@ app.post("/api/salvaProdotto", (req, res) => {
  *      responses:
  *          204:
  *              description: NO CONTENT. Prodotto eliminato correttamente e nessun ritorno dall'API.
- *          404:
- *              description: NOT FOUND. Nessun Prodotto con tale ID presente nel sistema.
+ *          400:
+ *              description: BAD REQUEST. Errore nel caso in cui l'IDProdotto non sia valido.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -1165,8 +1157,8 @@ app.delete("/api/eliminaProdotto", (req, res) => {
  *      responses:
  *          204:
  *              description: NO CONTENT. Immagine modificata con successo e nessun ritorno dall'API.
- *          404:
- *              description: NOT FOUND. Nessun Prodotto con tale ID presente nel sistema.
+ *          400:
+ *              description: BAD REQUEST. Errore nel caso in cui i dati non siano validi.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */ 
@@ -1208,8 +1200,8 @@ app.post("/api/modificaImmagine", (req, res) => {
  *      responses:
  *          204:
  *              description: NO CONTENT. Prezzo inserito con successo e nessun ritorno dall'API.
- *          404:
- *              description: NOT FOUND. Nessun Prodotto con tale ID presente nel sistema.
+ *          400:
+ *              description: BAD REQUEST. Errore nel caso in cui i dati non siano validi.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -1241,8 +1233,6 @@ app.post("/api/aggiungiPrezzo", (req, res) => {
  *      responses:
  *          200:
  *              description: OK. Si ottengono correttamente tutti i Prodotti.
- *          404:
- *              description: NOT FOUND. Nessun Prodotto presente nel sistema.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -1269,8 +1259,6 @@ app.get("/api/trovaTuttiProdotti", (req, res) => {
  *      responses:
  *          200:
  *              description: OK. Si ottengono correttamente tutti i Prodotti con uno sconto valido associato.
- *          404:
- *              description: NOT FOUND. Nessun Prodotto scontato presente nel sistema.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -1302,8 +1290,6 @@ app.get("/api/trovaTuttiProdottiScontati", (req, res) => {
  *      responses:
  *          200:
  *              description: OK. Si ottengono correttamente tutti i Prodotti con uno sconto valido associato e che appartengono alla Categoria desiderata.
- *          404:
- *              description: NOT FOUND. Nessun Prodotto scontato e associato alla Categoria desiderata presente nel sistema.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -1336,8 +1322,6 @@ app.get("/api/trovaTuttiProdottiScontatiFiltroCategoria", (req, res) => {
  *      responses:
  *          200:
  *              description: OK. Si ottengono correttamente tutti i Prodotti con il nome desiderato.
- *          404:
- *              description: NOT FOUND. Nessun Prodotto con il nome desiderato presente nel sistema.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -1370,8 +1354,6 @@ app.get("/api/trovaProdottiFiltroNome", (req, res) => {
  *      responses:
  *          200:
  *              description: OK. Si otiene correttamente il Prodotto con l'ID desiderato.
- *          404:
- *              description: NOT FOUND. Nessun Prodotto con l'ID desiderato presente nel sistema.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -1404,8 +1386,6 @@ app.get("/api/trovaProdottoFiltroID", (req, res) => {
  *      responses:
  *          200:
  *              description: OK. Si ottengono correttamente tutti i Prodotti presenti nel Negozio desiderato.
- *          404:
- *              description: NOT FOUND. Nessun Prodotto associato al Negozio desiderato presente nel sistema.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -1438,8 +1418,6 @@ app.get("/api/trovaProdottiFiltroNegozio", (req, res) => {
  *      responses:
  *          200:
  *              description: OK. Si ottengono correttamente tutti i Prodotti appartenenti alla Categoria desiderata.
- *          404:
- *              description: NOT FOUND. Nessun Prodotto associato alla Categoria desiderata presente nel sistema.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -1474,8 +1452,10 @@ app.get("/api/trovaProdottiFiltroCategoria", (req, res) => {
  *      responses:
  *          204:
  *              description: NO CONTENT. Utente eliminato correttamente e nessun ritorno dall'API.
- *          404:
- *              description: NOT FOUND. Nessun Utente con tale username presente nel sistema.
+ *          303:
+ *              description: mettere.
+ *          403:
+ *              description: FORBIDDEN. Errore inviato nel caso in cui l'Utente non venga eliminato da se stesso o da un Amministratore.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -1537,10 +1517,8 @@ app.get("/api/ripristinoPassword", (req, res) => {
  *         type: string
  *         description: Email dell'Utente desiderato.
  *      responses:
- *          204:
+ *          303:
  *              description: NO CONTENT. Attivazione avvenuta correttamente e nessun ritorno dall'API.
- *          404:
- *              description: NOT FOUND. Nessun Utente con tale username presente nel sistema.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -1585,10 +1563,12 @@ app.patch("/api/attiva2AF", (req, res) => {
  *      responses:
  *          204:
  *              description: NO CONTENT. Modifica avvenuta correttamente e nessun ritorno dall'API.
- *          401:
- *              description: UNAUTHORIZED. Impossibile eseguire l'operazione poiché la vecchia password è errata.
- *          404:
- *              description: NOT FOUND. Nessun Utente con tale username presente nel sistema.
+ *          303:
+ *              description: NO CONTENT. Modifica avvenuta correttamente e nessun ritorno dall'API.
+ *          400:
+ *              description: BAD REQUEST. Capire.
+ *          403:
+ *              description: FORBIDDEN. Errore inviato nel caso in cui la password sia errata.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -1651,10 +1631,10 @@ app.patch("/api/modificaPassword", (req, res) => {
  *      responses:
  *          204:
  *              description: NO CONTENT. Modifica avvenuta correttamente e nessun ritorno dall'API.
- *          404:
+ *          303:
  *              description: NOT FOUND. Nessun Utente con tale username presente nel sistema.
- *          409:
- *              description: CONFLICT. Mail già presente nel sistema.
+ *          403:
+ *              description: FORBIDDEN. Errore inviato nel caso in cui l'Email dell'Utente non venga modificata da se stesso o da un Amministratore.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -1702,8 +1682,10 @@ app.patch("/api/modificaEmail", (req, res) => {
  *      responses:
  *          204:
  *              description: NO CONTENT. Modifica avvenuta correttamente e nessun ritorno dall'API.
- *          404:
+ *          303:
  *              description: NOT FOUND. Nessun Utente con tale username presente nel sistema.
+ *          403:
+ *              description: FORBIDDEN. Errore inviato nel caso in cui il numero di telefono dell'Utente non venga modificata da se stesso o da un Amministratore.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -1751,8 +1733,10 @@ app.patch("/api/modificaNumeroTelefono", (req, res) => {
  *      responses:
  *          204:
  *              description: NO CONTENT. Modifica avvenuta correttamente e nessun ritorno dall'API.
- *          404:
+ *          303:
  *              description: NOT FOUND. Nessun Utente con tale username presente nel sistema.
+ *          403:
+ *              description: FORBIDDEN. Errore inviato nel caso in cui la foto profilo dell'Utente non venga modificata da se stesso o da un Amministratore.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -1799,8 +1783,10 @@ app.patch("/api/modificaFotoProfilo", (req, res) => {
  *      responses:
  *          204:
  *              description: NO CONTENT. Aggiunta avvenuta correttamente e nessun ritorno dall'API.
- *          404:
- *              description: NOT FOUND. Nessun Utente con tale username o nessun Prodotto con tale ID presente nel sistema.
+ *          400:
+ *              description: NOT FOUND. Errore inviato nel caso in cui l'ID del Prodotto da aggiungere non sia valido.
+ *          403:
+ *              description: FORBIDDEN. Errore inviato nel caso in cui un Utente non loggato (con username null) provi a inserire un prodotto come preferito.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -1847,8 +1833,10 @@ app.post("/api/aggiungiProdottoAiPreferiti", (req, res) => {
  *      responses:
  *          204:
  *              description: NO CONTENT. Rimozione avvenuta correttamente e nessun ritorno dall'API.
- *          404:
- *              description: NOT FOUND. Nessun Utente con tale username o nessun Prodotto con tale ID presente nel sistema.
+ *          400:
+ *              description: NOT FOUND. Errore inviato nel caso in cui l'ID del Prodotto da rimuovere non sia valido.
+ *          403:
+ *              description: FORBIDDEN. Errore inviato nel caso in cui un Utente non loggato (con username null) provi a rimuovere un prodotto dai preferiti.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -1895,8 +1883,10 @@ app.delete("/api/rimuoviProdottoDaiPreferiti", (req, res) => {
  *      responses:
  *          204:
  *              description: NO CONTENT. Aggiunta avvenuta correttamente e nessun ritorno dall'API.
- *          404:
- *              description: NOT FOUND. Nessun Utente con tale username o nessun Negozio con tale ID presente nel sistema.
+ *          400:
+ *              description: NOT FOUND. Errore inviato nel caso in cui l'ID del Negozio da aggiungere non sia valido.
+ *          403:
+ *              description: FORBIDDEN. Errore inviato nel caso in cui un Utente non loggato (con username null) provi a inserire un Negozio come preferito.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -1940,9 +1930,11 @@ app.post("/api/aggiungiNegozioAiPreferiti", (req, res) => {
  *         description: ID del Negozio da rimuovere dai preferiti.
  *      responses:
  *          204:
- *              description: NO CONTENT. Rimozione avvenuta correttamente e nessun ritorno dall'API.
- *          404:
- *              description: NOT FOUND. Nessun Utente con tale username o nessun Negozio con tale ID presente nel sistema.
+ *              description: NO CONTENT. Aggiunta avvenuta correttamente e nessun ritorno dall'API.
+ *          400:
+ *              description: NOT FOUND. Errore inviato nel caso in cui l'ID del Negozio da rimuovere non sia valido.
+ *          403:
+ *              description: FORBIDDEN. Errore inviato nel caso in cui un Utente non loggato (con username null) provi a rimuovere un Negozio dai preferiti.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -1981,10 +1973,11 @@ app.delete("/api/rimuoviNegozioDaiPreferiti", (req, res) => {
  *         type: string
  *         description: Username dell'Utente desiderato.
  *      responses:
+ *      responses:
  *          200:
- *              description: OK. Dati Ottenuti con successo.
- *          404:
- *              description: NOT FOUND. Nessun Utente con tale username presente nel sistema.
+ *              description: OK. Dati ottenuti con successo.
+ *          403:
+ *              description: FORBIDDEN. Errore inviato nel caso in cui i dati dell'Utente non vengano richiesti dall'Utente stesso o da un Amministratore.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -2019,8 +2012,8 @@ app.get("/api/ottieniDatiUtente", (req, res) => {
  *      responses:
  *          200:
  *              description: OK. Si ottengono correttamente tutti gli Utenti.
- *          404:
- *              description: NOT FOUND. Nessun Utente presente nel sistema.
+ *          403:
+ *              description: FORBIDDEN. Errore inviato nel caso in cui chi chiede i dati non è un Amministratore.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -2058,8 +2051,8 @@ app.get("/api/trovaTuttiUtenti", (req, res) => {
  *      responses:
  *          200:
  *              description: OK. Si ottengono correttamente i Prodotti preferiti dell'Utente desiderato.
- *          404:
- *              description: NOT FOUND. Nessun Utente presente nel sistema con tale username.
+ *          403:
+ *              description: FORBIDDEN. Errore inviato nel caso in cui i prodotti preferiti vengano richiesti da un utente non registrato.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -2102,8 +2095,8 @@ app.get("/api/ottieniProdottiPreferiti", (req, res) => {
  *      responses:
  *          200:
  *              description: OK. Il sistema riferisci se il Prodotto è nei preferiti dell'Utente oppure no.
- *          404:
- *              description: NOT FOUND. Nessun Utente con tale Username o nessun Prodotto con tale ID presente nel sistema.
+ *          403:
+ *              description: FORBIDDEN. Errore inviato nel caso in cui chi inviata la richiesta non è un Utente loggato (con username null).
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -2143,8 +2136,8 @@ app.get("/api/checkProdottoPreferito", (req, res) => {
  *      responses:
  *          200:
  *              description: OK. Si ottengono correttamente i Negozi preferiti dell'Utente desiderato.
- *          404:
- *              description: NOT FOUND. Nessun Utente presente nel sistema con tale username.
+ *          403:
+ *              description: FORBIDDEN. Errore inviato nel caso in cui i negozi preferiti vengano richiesti da un utente non registrato.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -2187,8 +2180,8 @@ app.get("/api/ottieniNegozioPreferito", (req, res) => {
  *      responses:
  *          200:
  *              description: OK. Il sistema riferisci se il Negozio è nei preferiti dell'Utente oppure no.
- *          404:
- *              description: NOT FOUND. Nessun Utente con tale Username o nessun Negozio con tale ID presente nel sistema.
+ *          403:
+ *              description: FORBIDDEN. Errore inviato nel caso in cui chi inviata la richiesta non è un Utente loggato (con username null).
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -2251,6 +2244,8 @@ app.get("/api/checkNegozioPreferito", (req, res) => {
  *      responses:
  *          201:
  *              description: CREATED. Recensione creata correttamente e salvato.
+ *          403:
+ *              description: FORBIDDEN. Errore inviato nel caso in cui chi inviata la richiesta non è un Utente loggato (con username null).
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -2306,13 +2301,14 @@ app.post("/api/salvaRecensione", (req, res) => {
  *      responses:
  *          204:
  *              description: NO CONTENT. Recensione eliminata correttamente e nessun ritorno dall'API.
- *          404:
- *              description: NOT FOUND. Nessuna Recensione con tale ID o nessun Utente con tale Username presente nel sistema.
+ *          400:
+ *              description: BAD REQUEST. Errore nel caso in cui i dati non siano validi.
+ *          403:
+ *              description: FORBIDDEN. Errore nel caso in cui un Utente non registrato provi ad eliminare un Recensione o se un Utente diverso dal creatore della Recensioni o un Amministratore provi ad eliminare la Recensione.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */ 
 
-//Non so se manca il 401 nonauthorized
 app.delete("/api/eliminaRecensione", (req, res) => {
     if(req.session.user != null){
         var User = req.session.user;
@@ -2359,8 +2355,6 @@ app.delete("/api/eliminaRecensione", (req, res) => {
  *      responses:
  *          200:
  *              description: OK. Si ottengono correttamente tutte le Recensioni effettuate dall'Utente interessato.
- *          404:
- *              description: NOT FOUND. Nessuna Recensione associato all'Utente interessato o nessun Utente con tale Username presente nel sistema.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -2392,8 +2386,6 @@ app.get("/api/trovaRecensioniFiltroUtente", (req, res) => {
  *      responses:
  *          200:
  *              description: OK. Si ottengono correttamente tutte le Recensioni riferite al Negozio interessato.
- *          404:
- *              description: NOT FOUND. Nessuna Recensione associato al Negozio interessato o nessun Negozio con tale ID presente nel sistema.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -2420,8 +2412,6 @@ app.get("/api/trovaRecensioniFiltroNegozio", (req, res) => {
  *      responses:
  *          200:
  *              description: OK. Si ottengono correttamente tutte le Recensioni presenti nel sistema.
- *          404:
- *              description: NOT FOUND. Nessuna Recensione presente nel sistema.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -2445,7 +2435,7 @@ app.get("/api/trovaTutteRecensioni", (req, res) => {
  * /api/inviaMail:
  *  get:
  *      description: Usata per inviare Mail agli Utenti. Non pienamente implementata.
- *      tags: ["Recensioni"]
+ *      tags: ["GMail"]
  *      parameters:
  *       - in: body
  *         name: Dati Email
