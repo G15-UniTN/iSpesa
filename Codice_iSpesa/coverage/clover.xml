@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1707083085865" clover="3.2.0">
-  <project timestamp="1707083085865" name="All files">
+<coverage generated="1707083357432" clover="3.2.0">
+  <project timestamp="1707083357433" name="All files">
     <metrics statements="883" coveredstatements="520" conditionals="313" coveredconditionals="154" methods="131" coveredmethods="101" elements="1327" coveredelements="775" complexity="0" loc="883" ncloc="883" packages="1" files="1" classes="1"/>
     <file name="main.js" path="C:\Users\Gabriele\Desktop\coding_shit\uni projects\iSpesa\Codice_iSpesa\main.js">
       <metrics statements="883" coveredstatements="520" conditionals="313" coveredconditionals="154" methods="131" coveredmethods="101"/>

@@ -123,4 +123,3 @@ describe('Suite testing API admin su utente_registrato', () => {
         expect(response.statusCode).toEqual(204);
     })
 })
-
