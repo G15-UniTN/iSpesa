@@ -817,7 +817,7 @@ app.delete("/api/eliminaNegozio", (req, res) => {
 
 /**
  * @swagger
- * /api/modificaOrario:
+ * /api/modificaOrari:
  *  patch:
  *      description: Modifica l'orario di un Negozio.
  *      tags: ["Negozi"]
@@ -838,7 +838,7 @@ app.delete("/api/eliminaNegozio", (req, res) => {
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */ 
-app.patch("/api/modificaOrario", (req, res) => {
+app.patch("/api/modificaOrari", (req, res) => {
     var IDNegozio = req.body.IDNegozio;
     var Orari = req.body.Orari;
     if(req.session.isAdmin){
