@@ -117,7 +117,7 @@ app.get("/login", (req, res) => {
 
 app.get("/logout", (req, res) => {
     if(req.session.user != null){
-        req.session.user = null;
+        req.session.destroy();
     }
     res.redirect("/");
 })
@@ -209,28 +209,29 @@ app.post("/login", (req, res) => {
     var username = req.body.username;
     var password = req.body.password;
     var sql = "SELECT Username, Password, isAdmin FROM utente_registrato WHERE Username = '" + username + "' AND Password = '" + password + "'";
-    con.connect(function(err) {
-        if (err) console.log(err);
-        con.query(sql, function(err, result, fields){
-            if(err) console.log(err);
-            if(result.length > 0){
-                req.session.regenerate(function(){
-                    req.session.user = username;
-                    if(result[0].isAdmin){
-                        req.session.isAdmin = true;
-                    }
-                    else{
-                        req.session.isAdmin = false;
-                    }
-                    res.redirect("/");
-                    return;
-                })
-            }
-            else{
-                res.redirect("/login?credenziali_errate=true");
+    con.query(sql, function(err, result, fields){
+        if(err) {
+            console.log(err);
+            res.sendStatus(500);
+        }
+        if(result.length > 0){
+            req.session.regenerate(function(){
+                req.session.user = username;
+                if(result[0].isAdmin){
+                    req.session.isAdmin = true;
+                    console.log(req.session);
+                }
+                else{
+                    req.session.isAdmin = false;
+                }
+                res.redirect(200, "/");
                 return;
-            }
-        })
+            })
+        }
+        else{
+            res.redirect("/login?credenziali_errate=true");
+            return;
+        }
     })
 });
 
@@ -277,23 +278,23 @@ app.post("/registrati", (req, res) => {
     var email = req.body.email;
     var number = req.body.number;
     var check_fields = "SELECT * FROM utente_registrato WHERE Username = '" + username + "'";
-    con.connect(async function(err) {
-        if (err) console.log(err);
-        con.query(check_fields, function(err, result, fields){
-            if(err) console.log(err);
-            if(result.length > 0){
-                res.redirect("/signup?exists_username=true");
+    con.query(check_fields, function(err, result, fields){
+        if(err) {
+            console.log(err);
+            res.sendStatus(500);
+        }
+        if(result.length > 0){
+            res.redirect("/signup?exists_username=true");
+            return;
+        }
+        else{
+            query_new_user = "INSERT INTO utente_registrato (Username, FotoProfilo, Email, Telefono, Password) VALUES ('" + username + "','" + "/img/sito/pfp.jpg" + "','" + email + "','" + number + "','" + password + "')";
+            con.query(query_new_user, function(err, result, fields){
+                if(err) console.log(err);
+                res.redirect("/login");
                 return;
-            }
-            else{
-                query_new_user = "INSERT INTO utente_registrato (Username, FotoProfilo, Email, Telefono, Password) VALUES ('" + username + "','" + "/img/sito/pfp.jpg" + "','" + email + "','" + number + "','" + password + "')";
-                con.query(query_new_user, function(err, result, fields){
-                    if(err) console.log(err);
-                    res.redirect("/login");
-                    return;
-                })
-            }
-        })
+            })
+        }
     })
 });
 
@@ -344,7 +345,7 @@ app.post("/api/salvaVolantino", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Errore");
+            res.sendStatus(500);
             return;
         };
         res.send("Aggiunto");
@@ -376,7 +377,7 @@ app.delete("/api/eliminaVolantino", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Errore");
+            res.sendStatus(500);
             return;
         };
         res.send("Rimosso");
@@ -403,7 +404,7 @@ app.get("/api/trovaTuttiVolantini", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Errore");
+            res.sendStatus(500);
             return;
         };
         res.json(results);
@@ -435,7 +436,7 @@ app.get("/api/trovaVolantiniFiltroNegozio", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Errore");
+            res.sendStatus(500);
             return;
         };
         res.json(results);
@@ -494,7 +495,7 @@ app.post("/api/salvaSconto", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Errore");
+            res.sendStatus(500);
             return;
         };
         res.send("Aggiunto");
@@ -527,7 +528,7 @@ app.delete("/api/eliminaSconto", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Errore");
+            res.sendStatus(500);
             return;
         };
         res.send("Rimosso");
@@ -554,7 +555,7 @@ app.get("/api/trovaTuttiSconti", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Errore");
+            res.sendStatus(500);
             return;
         };
         res.json(results);
@@ -587,7 +588,7 @@ app.get("/api/trovaScontiFiltroNegozio", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Errore");
+            res.sendStatus(500);
             return;
         };
         res.json(results);
@@ -614,7 +615,7 @@ app.get("/api/trovaScontiConCategoria", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Errore");
+            res.sendStatus(500);
             return;
         };
         res.json(results);
@@ -647,7 +648,7 @@ app.get("/api/trovaScontiConCategoriaFiltroNegozio", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Errore");
+            res.sendStatus(500);
             return;
         };
         res.json(results);
@@ -674,7 +675,7 @@ app.get("/api/trovaScontiConProdotto", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Errore");
+            res.sendStatus(500);
             return;
         };
         res.json(results);
@@ -707,7 +708,7 @@ app.get("/api/trovaScontiConProdottoFiltroNegozio", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Errore");
+            res.sendStatus(500);
             return;
         };
         res.json(results);
@@ -759,16 +760,26 @@ app.post("/api/salvaNegozio", (req, res) => {
     var Orari = req.body.Orari;
     var Nome = req.body.Nome;
     var Logo = req.body.Logo;
-    sql = "INSERT INTO negozio (Ubicazione, Orari, Nome, Logo) VALUES ('" + Ubicazione + "','" + Orari + "','" + Nome + "'" + Logo + "')";
-    con.query(sql, function(err, results){
-        if(err){
-            console.log(err);
-            res.send("Errore");
+    if(req.session.isAdmin){
+        if(Ubicazione == undefined || Orari == undefined || Nome == undefined || Logo == undefined){
+            res.sendStatus(400);
             return;
-        };
-        res.send("Aggiunto");
-        return;
-    });
+        }
+        sql = "INSERT INTO negozio (Ubicazione, Orari, Nome, Logo) VALUES ('" + Ubicazione + "','" + Orari + "','" + Nome + "','" + Logo + "')";
+        con.query(sql, function(err, results){
+            if(err){
+                console.log(err);
+                res.sendStatus(500);
+                return;
+            };
+            res.status(201);
+            res.json(results);
+            return;
+        });    
+    }
+    else{
+        res.sendStatus(403);
+    }
 })
 
 /**
@@ -792,16 +803,25 @@ app.post("/api/salvaNegozio", (req, res) => {
  */ 
 app.delete("/api/eliminaNegozio", (req, res) => {
     var IDNegozio = req.body.IDNegozio;
-    sql = "DELETE FROM negozio WHERE IDNegozio = '" + IDNegozio + "'";
-    con.query(sql, function(err, results){
-        if(err){
-            console.log(err);
-            res.send("Errore");
+    if(req.session.isAdmin){
+        if(IDNegozio == undefined){
+            res.sendStatus(400);
             return;
-        };
-        res.send("Rimosso");
-        return;
-    });
+        }
+        sql = "DELETE FROM negozio WHERE IDNegozio = '" + IDNegozio + "'";
+        con.query(sql, function(err, results){
+            if(err){
+                console.log(err);
+                res.sendStatus(500);
+                return;
+            };
+            res.sendStatus(204);
+            return;
+        });    
+    }
+    else{
+        res.sendStatus(403);
+    }
 })
 
 /**
@@ -829,17 +849,26 @@ app.delete("/api/eliminaNegozio", (req, res) => {
  */ 
 app.patch("/api/modificaOrario", (req, res) => {
     var IDNegozio = req.body.IDNegozio;
-    var Orario = req.body.Orario;
-    sql = "UPDATE negozio SET Orari = '" + Orario + "' WHERE IDNegozio = '" + IDNegozio + "'";
-    con.query(sql, function(err, results){
-        if(err){
-            console.log(err);
-            res.send("Errore");
+    var Orari = req.body.Orari;
+    if(req.session.isAdmin){
+        if(IDNegozio == undefined || Orari == undefined){
+            res.sendStatus(400);
             return;
-        };
-        res.send("Aggiornato");
-        return;
-    });
+        }
+        sql = "UPDATE negozio SET Orari = '" + Orari + "' WHERE IDNegozio = '" + IDNegozio + "'";
+        con.query(sql, function(err, results){
+            if(err){
+                console.log(err);
+                res.sendStatus(500);
+                return;
+            };
+            res.sendStatus(204);
+            return;
+        });    
+    }
+    else{
+        res.sendStatus(403);
+    }
 })
 
 /**
@@ -868,16 +897,25 @@ app.patch("/api/modificaOrario", (req, res) => {
 app.patch("/api/modificaUbicazione", (req, res) => {
     var IDNegozio = req.body.IDNegozio;
     var Ubicazione = req.body.Ubicazione;
-    sql = "UPDATE negozio SET Ubicazione = '" + Ubicazione + "' WHERE IDNegozio = '" + IDNegozio + "'";
-    con.query(sql, function(err, results){
-        if(err){
-            console.log(err);
-            res.send("Errore");
+    if(req.session.isAdmin){
+        if(IDNegozio == undefined || Ubicazione == undefined){
+            res.sendStatus(400);
             return;
-        };
-        res.send("Aggiornato");
-        return;
-    });
+        }
+        sql = "UPDATE negozio SET Ubicazione = '" + Ubicazione + "' WHERE IDNegozio = '" + IDNegozio + "'";
+        con.query(sql, function(err, results){
+            if(err){
+                console.log(err);
+                res.sendStatus(500);
+                return;
+            };
+            res.sendStatus(204);
+            return;
+        });    
+    }
+    else{
+        res.sendStatus(403);
+    }
 })
 
 /**
@@ -899,9 +937,10 @@ app.get("/api/trovaTuttiNegozi", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Errore");
+            res.sendStatus(500);
             return;
         };
+        res.status(200);
         res.json(results);
         return;
     });
@@ -932,9 +971,10 @@ app.get("/api/trovaTuttiNegoziFiltroNome", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Errore");
+            res.sendStatus(500);
             return;
         };
+        res.status(200);
         res.json(results);
         return;
     });
@@ -965,9 +1005,10 @@ app.get("/api/trovaTuttiNegoziFiltroUbicazione", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Errore");
+            res.sendStatus(500);
             return;
         };
+        res.status(200);
         res.json(results);
         return;
     });
@@ -998,9 +1039,10 @@ app.get("/api/trovaNegozioFiltroID", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Errore");
+            res.sendStatus(500);
             return;
         };
+        res.status(200);
         res.json(results);
         return;
     })
@@ -1054,7 +1096,7 @@ app.post("/api/salvaProdotto", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Errore");
+            res.sendStatus(500);
             return;
         };
         res.send("Aggiunto");
@@ -1086,7 +1128,7 @@ app.delete("/api/eliminaProdotto", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Errore");
+            res.sendStatus(500);
             return;
         };
         res.send("Rimosso");
@@ -1124,7 +1166,7 @@ app.patch("/api/modificaImmagine", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Errore");
+            res.sendStatus(500);
             return;
         };
         res.send("Aggiornato");
@@ -1163,7 +1205,7 @@ app.post("/api/aggiungiPrezzo", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Errore");
+            res.sendStatus(500);
             return;
         };
         res.send("Aggiunto");
@@ -1190,7 +1232,7 @@ app.get("/api/trovaTuttiProdotti", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Errore");
+            res.sendStatus(500);
             return;
         };
         res.json(results);
@@ -1217,7 +1259,7 @@ app.get("/api/trovaTuttiProdottiScontati", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Errore");
+            res.sendStatus(500);
             return;
         };
         res.json(results);
@@ -1251,7 +1293,7 @@ app.get("/api/trovaTuttiProdottiScontatiFiltroCategoria", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Errore");
+            res.sendStatus(500);
             return;
         };
         res.json(results);
@@ -1284,7 +1326,7 @@ app.get("/api/trovaProdottiFiltroNome", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Errore");
+            res.sendStatus(500);
             return;
         };
         res.json(results);
@@ -1317,7 +1359,7 @@ app.get("/api/trovaProdottoFiltroID", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Errore");
+            res.sendStatus(500);
             return;
         };
         res.json(results);
@@ -1350,7 +1392,7 @@ app.get("/api/trovaProdottiFiltroNegozio", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Errore");
+            res.sendStatus(500);
             return;
         };
         res.json(results);
@@ -1383,7 +1425,7 @@ app.get("/api/trovaProdottiFiltroCategoria", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Errore");
+            res.sendStatus(500);
             return;
         };
         res.json(results);
@@ -1420,7 +1462,7 @@ app.delete("/api/eliminaUtente", (req, res) => {
         con.query(sql, function(err, results){
             if(err){
                 console.log(err);
-                res.send("Errore");
+                res.sendStatus(500);
                 return;
             };
             res.status(200);
@@ -1474,7 +1516,7 @@ app.patch("/api/attiva2AF", (req, res) => {
         con.query(sql, function(err, results){
             if(err){
                 console.log(err);
-                res.send("Errore");
+                res.sendStatus(500);
                 return;
             };
             res.status(200);
@@ -1523,7 +1565,7 @@ app.patch("/api/modificaPassword", (req, res) => {
         con.query(sql, function(err, results){ // Controlla se la password vecchia corrisponde con quella nel database
             if(err){
                 console.log(err);
-                res.send("Errore");
+                res.sendStatus(500);
                 return;
             }
             else if(results.length > 0){
@@ -1531,7 +1573,7 @@ app.patch("/api/modificaPassword", (req, res) => {
                 con.query(sql, function(err, results){
                     if(err){
                         console.log(err);
-                        res.send("Errore");
+                        res.sendStatus(500);
                         return;
                     };
                     res.status(200);
@@ -1585,7 +1627,7 @@ app.patch("/api/modificaEmail", (req, res) => {
         con.query(sql, function(err, results){
             if(err){
                 console.log(err);
-                res.send("Errore");
+                res.sendStatus(500);
                 return;
             };
             res.status(200);
@@ -1627,7 +1669,7 @@ app.patch("/api/modificaNumeroTelefono", (req, res) => {
         con.query(sql, function(err, results){
             if(err){
                 console.log(err);
-                res.send("Errore");
+                res.sendStatus(500);
                 return;
             };
             res.status(200);
@@ -1669,7 +1711,7 @@ app.patch("/api/modificaFotoProfilo", (req, res) => {
         con.query(sql, function(err, results){
             if(err){
                 console.log(err);
-                res.send("Errore");
+                res.sendStatus(500);
                 return;
             };
             res.status(200);
@@ -1711,7 +1753,7 @@ app.post("/api/aggiungiProdottoAiPreferiti", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Errore");
+            res.sendStatus(500);
             return;
         };
         res.json(results);
@@ -1751,7 +1793,7 @@ app.delete("/api/rimuoviProdottoDaiPreferiti", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Errore");
+            res.sendStatus(500);
             return;
         };
         res.json(results);
@@ -1789,7 +1831,7 @@ app.post("/api/aggiungiNegozioAiPreferiti", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Errore");
+            res.sendStatus(500);
             return;
         };
         res.json(results);
@@ -1827,7 +1869,7 @@ app.delete("/api/rimuoviNegozioDaiPreferiti", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Errore");
+            res.sendStatus(500);
             return;
         };
         res.json(results);
@@ -1862,7 +1904,7 @@ app.get("/api/ottieniDatiUtente", (req, res) => {
         con.query(sql, function(err, results){
             if(err){
                 console.log(err);
-                res.send("Errore");
+                res.sendStatus(500);
                 return;
             };
             res.send(results);
@@ -1895,7 +1937,7 @@ app.get("/api/trovaTuttiUtenti", (req, res) => {
         con.query(sql, function(err, results){
             if(err){
                 console.log(err);
-                res.send("Errore");
+                res.sendStatus(500);
                 return;
             };
             res.send(results);
@@ -1933,7 +1975,7 @@ app.get("/api/ottieniProdottiPreferiti", (req, res) => {
         con.query(sql, function(err, results){
             if(err){
                 console.log(err);
-                res.send("Errore");
+                res.sendStatus(500);
                 return;
             };
             res.json(results);
@@ -1976,7 +2018,7 @@ app.get("/api/checkProdottoPreferito", (req, res) => {
         con.query(sql, function(err, results){
             if(err){
                 console.log(err);
-                res.send("Errore");
+                res.sendStatus(500);
                 return;
             };
             res.json(results);
@@ -2014,7 +2056,7 @@ app.get("/api/ottieniNegoziPreferiti", (req, res) => {
         con.query(sql, function(err, results){
             if(err){
                 console.log(err);
-                res.send("Errore");
+                res.sendStatus(500);
                 return;
             };
             res.json(results);
@@ -2057,7 +2099,7 @@ app.get("/api/checkNegozioPreferito", (req, res) => {
         con.query(sql, function(err, results){
             if(err){
                 console.log(err);
-                res.send("Errore");
+                res.sendStatus(500);
                 return;
             };
             res.json(results);
@@ -2127,7 +2169,7 @@ app.post("/api/salvaRecensione", (req, res) => {
         con.query(sql, function(err, results){
             if(err){
                 console.log(err);
-                res.send("Errore");
+                res.sendStatus(500);
                 return;
             };
             res.status(200);
@@ -2174,7 +2216,7 @@ app.delete("/api/eliminaRecensione", (req, res) => {
             con.query(sql, function(err, results){
                 if(err){
                     console.log(err);
-                    res.send("Errore");
+                    res.sendStatus(500);
                     return;
                 };
                 res.json(results);
@@ -2215,7 +2257,7 @@ app.get("/api/trovaRecensioniFiltroUtente", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Errore");
+            res.sendStatus(500);
             return;
         };
         res.json(results);
@@ -2248,7 +2290,7 @@ app.get("/api/trovaRecensioniFiltroNegozio", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Errore");
+            res.sendStatus(500);
             return;
         };
         res.json(results);
@@ -2275,7 +2317,7 @@ app.get("/api/trovaTutteRecensioni", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Errore");
+            res.sendStatus(500);
             return;
         };
         res.json(results);
@@ -2339,7 +2381,7 @@ app.get("/api/categorie", (req, res) => {
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
-            res.send("Errore");
+            res.sendStatus(500);
             return;
         };
         res.status(200);
