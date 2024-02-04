@@ -587,6 +587,58 @@ app.delete("/api/eliminaSconto", (req, res) => {
     }
 })
 
+app.post("/api/associaScontoProdotto", (req, res) => {
+    var IDProdotto = req.body.IDProdotto;
+    var IDSconto = req.body.IDSconto;
+    if(req.session.isAdmin){
+        if(IDProdotto == undefined || IDSconto == undefined){
+            res.sendStatus(400);
+            return;
+        }
+        sql = "INSERT INTO validita_sconto_prodotto (Sconto, prodotto) VALUES ('" + IDSconto + "','" + IDProdotto + "')";
+        con.query(sql, function(err, results){
+            /* istanbul ignore next */
+            if(err){
+                console.log(err);
+                res.sendStatus(500);
+                return;
+            };
+            res.sendStatus(204);
+            return;
+        });    
+    }
+    else{
+        res.sendStatus(403);
+        return;
+    }
+})
+
+app.post("/api/associaScontoCategoria", (req, res) => {
+    var Categoria = req.body.Categoria;
+    var IDSconto = req.body.IDSconto;
+    if(req.session.isAdmin){
+        if(IDSconto == undefined || Categoria == undefined){
+            res.sendStatus(400);
+            return;
+        }
+        sql = "INSERT INTO validita_sconto_categoria (IDSconto, CategoriaApplicabile) VALUES ('" + IDSconto + "','" + Categoria + "')";
+        con.query(sql, function(err, results){
+            /* istanbul ignore next */
+            if(err){
+                console.log(err);
+                res.sendStatus(500);
+                return;
+            };
+            res.sendStatus(204);
+            return;
+        });    
+    }
+    else{
+        res.sendStatus(403);
+        return;
+    }
+})
+
 /**
  * @swagger
  * /api/trovaTuttiSconti:

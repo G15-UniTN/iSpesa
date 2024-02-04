@@ -43,6 +43,24 @@ describe('Suite testing API sconto', () => {
         expect(response.statusCode).toEqual(403);
     })
 
+    test("Chiamata all'API POST '/api/associaScontoProdotto' da un utente non admin", async () => {
+        const inputBody = {
+            IDSconto: "1",
+            IDProdotto: "2",
+        }
+        const response = await testSession.post("/api/associaScontoProdotto").send(inputBody);
+        expect(response.statusCode).toEqual(403);
+    })
+
+    test("Chiamata all'API POST '/api/associaScontoCategoria' da un utente non admin", async () => {
+        const inputBody = {
+            IDSconto: "1",
+            Categoria: "Frutta",
+        }
+        const response = await testSession.post("/api/associaScontoCategoria").send(inputBody);
+        expect(response.statusCode).toEqual(403);
+    })
+
     it('should authenticate as admin', async () => {
         await testSession.post("/login").send(adminUser).expect(303); //Logs as admin
     })
@@ -50,13 +68,42 @@ describe('Suite testing API sconto', () => {
     test("Chiamata all'API POST '/api/salvaSconto' senza dati", async () => {
         const response = await testSession.post("/api/salvaSconto");
         expect(response.statusCode).toEqual(400);
-        inputBody.IDSconto = response.body.insertId;
     })
 
+    var IDSconto;
     test("Chiamata all'API POST '/api/salvaSconto'", async () => {
         const response = await testSession.post("/api/salvaSconto").send(inputBody);
         expect(response.statusCode).toEqual(201);
         inputBody.IDSconto = response.body.insertId;
+        IDSconto = inputBody.IDSconto;
+    })
+
+    test("Chiamata all'API POST '/api/associaScontoProdotto' senza dati", async () => {
+        const response = await testSession.post("/api/associaScontoProdotto");
+        expect(response.statusCode).toEqual(400);
+    })
+
+    test("Chiamata all'API POST '/api/associaScontoProdotto'", async () => {
+        const inputBody = {
+            IDSconto: IDSconto,
+            IDProdotto: "2",
+        }
+        const response = await testSession.post("/api/associaScontoProdotto").send(inputBody);
+        expect(response.statusCode).toEqual(204);
+    })
+
+    test("Chiamata all'API POST '/api/associaScontoCategoria' senza dati", async () => {
+        const response = await testSession.post("/api/associaScontoCategoria");
+        expect(response.statusCode).toEqual(400);
+    })
+
+    test("Chiamata all'API POST '/api/associaScontoCategoria'", async () => {
+        const inputBody = {
+            IDSconto: IDSconto,
+            Categoria: "Frutta",
+        }
+        const response = await testSession.post("/api/associaScontoCategoria").send(inputBody);
+        expect(response.statusCode).toEqual(204);
     })
 
     test("Chiamata all'API GET '/api/trovaTuttiSconti'", async () => {
