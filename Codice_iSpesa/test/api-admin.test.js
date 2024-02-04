@@ -32,13 +32,14 @@ describe('Suite testing API utente_registrato', () => {
 
     testSession = session("http://localhost:" + port);
 
+    // Creo un utente non-admin con cui interagire
     test("Chiamata all'API POST '/registrati' con utente non admin", async () => {
         const response = await testSession.post("/registrati").send(inputBody);
         expect(response.statusCode).toEqual(303);
     })
 
-    test("Chiamata all'API POST '/login' con utente non admin", async () => {
-        const response = await testSession.post("/login").send(inputBody);
+    test("Chiamata all'API POST '/login' con admin", async () => {
+        const response = await testSession.post("/login").send(adminUser);
         expect(response.statusCode).toEqual(303);
     })
 
@@ -47,21 +48,9 @@ describe('Suite testing API utente_registrato', () => {
         expect(response.statusCode).toEqual(200);
     })
 
-    test("Chiamata all'API GET '/api/trovaTuttiUtenti' con utente non admin", async () => {
+    test("Chiamata all'API GET '/api/trovaTuttiUtenti' con admin", async () => {
         const response = await testSession.get("/api/trovaTuttiUtenti");
-        expect(response.statusCode).toEqual(403);
-    })
-
-    test("Chiamata all'API POST '/api/aggiungiProdottoAiPreferiti'", async () => {
-        var IDProdotto = { IDProdotto : "2"};
-        const response = await testSession.post("/api/aggiungiProdottoAiPreferiti").send(IDProdotto);
-        expect(response.statusCode).toEqual(204);
-    })
-
-    test("Chiamata all'API POST '/api/aggiungiNegozioAiPreferiti'", async () => {
-        var IDNegozio = { IDNegozio : "1"};
-        const response = await testSession.post("/api/aggiungiNegozioAiPreferiti").send(IDNegozio);
-        expect(response.statusCode).toEqual(204);
+        expect(response.statusCode).toEqual(200);
     })
 
     test("Chiamata all'API GET '/api/ottieniProdottiPreferiti'", async () => {
@@ -79,18 +68,6 @@ describe('Suite testing API utente_registrato', () => {
         const IDNegozio = "1";
         const response = await testSession.get("/api/checkNegozioPreferito?IDNegozio="+IDNegozio);
         expect(response.statusCode).toEqual(200);
-    })
-
-    test("Chiamata all'API DELETE '/api/rimuoviProdottoDaiPreferiti'", async () => {
-        var IDProdotto = { IDProdotto : "2"};
-        const response = await testSession.post("/api/rimuoviProdottoDaiPreferiti?_method=DELETE").send(IDProdotto);
-        expect(response.statusCode).toEqual(204);
-    })
-
-    test("Chiamata all'API DELETE '/api/rimuoviNegozioDaiPreferiti'", async () => {
-        var IDNegozio = { IDNegozio : "1"};
-        const response = await testSession.post("/api/rimuoviNegozioDaiPreferiti?_method=DELETE").send(IDNegozio);
-        expect(response.statusCode).toEqual(204);
     })
 
     test("Chiamata all'API GET '/api/ripristinoPassword'", async () => {

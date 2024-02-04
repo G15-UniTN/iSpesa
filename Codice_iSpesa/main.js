@@ -213,6 +213,7 @@ app.post("/login", (req, res) => {
         if(err) {
             console.log(err);
             res.sendStatus(500);
+            return;
         }
         if(result.length > 0){
             req.session.regenerate(function(){
@@ -281,16 +282,21 @@ app.post("/registrati", (req, res) => {
         if(err) {
             console.log(err);
             res.sendStatus(500);
+            return;
         }
         if(result.length > 0){
-            res.redirect(303, "/signup?exists_username=true");
+            res.redirect("/signup?exists_username=true");
             return;
         }
         else{
-            query_new_user = "INSERT INTO utente_registrato (Username, FotoProfilo, Email, Telefono, Password) VALUES ('" + Username + "','" + "/img/sito/pfp.jpg" + "','" + Email + "','" + Telefono + "','" + Password + "')";
-            con.query(query_new_user, function(err, result, fields){
-                if(err) console.log(err);
-                res.redirect("/login");
+            query_new_user = "INSERT INTO utente_registrato (Username, FotoProfilo, Email, Telefono, `Password`) VALUES ('" + Username + "','" + "/img/sito/pfp.jpg" + "','" + Email + "','" + Telefono + "','" + Password + "')";
+            con.query(query_new_user, function(err, results){
+                if(err) {
+                    console.log(err);
+                    res.sendStatus(500);
+                    return;
+                }
+                res.redirect(303, "/login");
                 return;
             })
         }
@@ -1475,7 +1481,7 @@ app.get("/api/trovaProdottiFiltroCategoria", (req, res) => {
  */
 app.delete("/api/eliminaUtente", (req, res) => {
     var User = req.session.user;
-    if(req.session.isAdmin){
+    if(req.session.isAdmin || User == req.body.Username){
         var Username = req.body.Username;
         sql = "DELETE FROM utente_registrato WHERE Username = '" + Username + "'";
         con.query(sql, function(err, results){
@@ -1484,9 +1490,17 @@ app.delete("/api/eliminaUtente", (req, res) => {
                 res.sendStatus(500);
                 return;
             };
-            res.redirect(204, 'back');
+            if(req.headers.accept != undefined && req.headers.accept.includes("text/html")){
+                res.redirect(303, 'back');
+                return;
+            }
+            res.sendStatus(204);
             return;
         });
+    }
+    else{
+        res.sendStatus(403);
+        return;
     }
 })
 
@@ -1664,6 +1678,10 @@ app.patch("/api/modificaEmail", (req, res) => {
             return;
         });
     }
+    else{
+        res.sendStatus(403);
+        return;
+    }
 })
 
 /**
@@ -1709,6 +1727,10 @@ app.patch("/api/modificaNumeroTelefono", (req, res) => {
             return;
         });
     }
+    else{
+        res.sendStatus(403);
+        return;
+    }
 })
 
 /**
@@ -1753,6 +1775,9 @@ app.patch("/api/modificaFotoProfilo", (req, res) => {
             res.sendStatus(204);
             return;
         });
+    }
+    else{
+        res.sendStatus(403);
     }
 })
 
