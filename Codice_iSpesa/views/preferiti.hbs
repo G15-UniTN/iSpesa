@@ -106,7 +106,7 @@
       
       function caricaNegoziPreferiti(){
         document.getElementById("listaNegozi").innerHTML = "";
-        fetch(url_sito + "/api/ottieniNegoziPreferiti")
+        fetch(url_sito + "/api/ottieniNegozioPreferito")
         .then(response => response.json())
         .then(data => {
           var i = 0;

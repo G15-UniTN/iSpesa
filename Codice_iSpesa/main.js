@@ -206,9 +206,9 @@ app.get("/prodotto", (req, res) => {
  *              description: SERVER ERROR. Di varia natura.
  */
 app.post("/login", (req, res) => {
-    var username = req.body.username;
-    var password = req.body.password;
-    var sql = "SELECT Username, Password, isAdmin FROM utente_registrato WHERE Username = '" + username + "' AND Password = '" + password + "'";
+    var Username = req.body.Username;
+    var Password = req.body.Password;
+    var sql = "SELECT Username, Password, isAdmin FROM utente_registrato WHERE Username = '" + Username + "' AND Password = '" + Password + "'";
     con.query(sql, function(err, result, fields){
         if(err) {
             console.log(err);
@@ -216,14 +216,14 @@ app.post("/login", (req, res) => {
         }
         if(result.length > 0){
             req.session.regenerate(function(){
-                req.session.user = username;
+                req.session.user = Username;
                 if(result[0].isAdmin){
                     req.session.isAdmin = true;
                 }
                 else{
                     req.session.isAdmin = false;
                 }
-                res.redirect(200, "/");
+                res.redirect(303, "/");
                 return;
             })
         }
@@ -272,22 +272,22 @@ app.post("/login", (req, res) => {
 
 //metti tu altre risposte pls
 app.post("/registrati", (req, res) => {
-    var username = req.body.username;
-    var password = req.body.password;
-    var email = req.body.email;
-    var number = req.body.number;
-    var check_fields = "SELECT * FROM utente_registrato WHERE Username = '" + username + "'";
+    var Username = req.body.Username;
+    var Password = req.body.Password;
+    var Email = req.body.Email;
+    var Telefono = req.body.Telefono;
+    var check_fields = "SELECT * FROM utente_registrato WHERE Username = '" + Username + "'";
     con.query(check_fields, function(err, result, fields){
         if(err) {
             console.log(err);
             res.sendStatus(500);
         }
         if(result.length > 0){
-            res.redirect("/signup?exists_username=true");
+            res.redirect(303, "/signup?exists_username=true");
             return;
         }
         else{
-            query_new_user = "INSERT INTO utente_registrato (Username, FotoProfilo, Email, Telefono, Password) VALUES ('" + username + "','" + "/img/sito/pfp.jpg" + "','" + email + "','" + number + "','" + password + "')";
+            query_new_user = "INSERT INTO utente_registrato (Username, FotoProfilo, Email, Telefono, Password) VALUES ('" + Username + "','" + "/img/sito/pfp.jpg" + "','" + Email + "','" + Telefono + "','" + Password + "')";
             con.query(query_new_user, function(err, result, fields){
                 if(err) console.log(err);
                 res.redirect("/login");
@@ -1082,16 +1082,27 @@ app.post("/api/salvaProdotto", (req, res) => {
     var Immagine = req.body.Immagine;
     var Categoria = req.body.Categoria;
     var IDNegozio = req.body.IDNegozio;
-    sql = "INSERT INTO prodotto (Nome, Immagine, Categoria, IDNegozio) VALUES ('" + Nome + "','" + Immagine + "','" + Categoria + "'" + IDNegozio + "')";
-    con.query(sql, function(err, results){
-        if(err){
-            console.log(err);
-            res.sendStatus(500);
-            return;
-        };
-        res.send("Aggiunto");
+    if(Nome == undefined || Immagine == undefined || Categoria == undefined || IDNegozio == undefined){
+        res.sendStatus(400);
         return;
-    });
+    }
+    if(req.session.isAdmin){
+        sql = "INSERT INTO prodotto (Nome, Immagine, Categoria, NegozioProvenienza) VALUES ('" + Nome + "','" + Immagine + "','" + Categoria + "','" + IDNegozio + "')";
+        con.query(sql, function(err, results){
+            if(err){
+                console.log(err);
+                res.sendStatus(500);
+                return;
+            };
+            res.status(201);
+            res.json(results);
+            return;
+        });    
+    }
+    else{
+        res.sendStatus(403);
+        return;
+    }
 })
 
 /**
@@ -1114,6 +1125,10 @@ app.post("/api/salvaProdotto", (req, res) => {
  */
 app.delete("/api/eliminaProdotto", (req, res) => {
     var IDProdotto = req.body.IDProdotto;
+    if(IDProdotto == undefined){
+        res.statusCode(400);
+        return;
+    }
     sql = "DELETE FROM prodotto WHERE IDProdotto = '" + IDProdotto + "'";
     con.query(sql, function(err, results){
         if(err){
@@ -1121,9 +1136,9 @@ app.delete("/api/eliminaProdotto", (req, res) => {
             res.sendStatus(500);
             return;
         };
-        res.send("Rimosso");
+        res.sendStatus(204);
         return;
-    });
+    });  
 })
 
 /**
@@ -1149,9 +1164,13 @@ app.delete("/api/eliminaProdotto", (req, res) => {
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */ 
-app.patch("/api/modificaImmagine", (req, res) => {
-    var IDProdotto = req.body.IDProdotto;
+app.post("/api/modificaImmagine", (req, res) => {
     var Immagine = req.body.Immagine;
+    var IDProdotto = req.body.IDProdotto;
+    if(IDProdotto == undefined || Immagine == undefined){
+        res.sendStatus(400);
+        return;
+    }
     sql = "UPDATE prodotto SET Immagine = '" + Immagine + "' WHERE IDProdotto = '" + IDProdotto + "'";
     con.query(sql, function(err, results){
         if(err){
@@ -1159,9 +1178,9 @@ app.patch("/api/modificaImmagine", (req, res) => {
             res.sendStatus(500);
             return;
         };
-        res.send("Aggiornato");
+        res.sendStatus(201);
         return;
-    });
+    });      
 })
 
 /**
@@ -1189,16 +1208,20 @@ app.patch("/api/modificaImmagine", (req, res) => {
  *              description: SERVER ERROR. Di varia natura.
  */
 app.post("/api/aggiungiPrezzo", (req, res) => {
-    var Prodotto = req.body.Prodotto;
+    var IDProdotto = req.body.IDProdotto;
     var Prezzo = req.body.Prezzo;
-    sql = "INSERT INTO storicoprezzi (Prodotto, Prezzo) VALUES ('" + Prodotto + "','" + Prezzo + "')";
+    if(IDProdotto == undefined || Prezzo == undefined){
+        res.sendStatus(400);
+        return;
+    }
+    sql = "INSERT INTO storicoprezzi (Prodotto, Prezzo) VALUES ('" + IDProdotto + "','" + Prezzo + "')";
     con.query(sql, function(err, results){
         if(err){
             console.log(err);
             res.sendStatus(500);
             return;
         };
-        res.send("Aggiunto");
+        res.sendStatus(204);
         return;
     });
 })
@@ -1225,6 +1248,7 @@ app.get("/api/trovaTuttiProdotti", (req, res) => {
             res.sendStatus(500);
             return;
         };
+        res.status(200);
         res.json(results);
         return;
     })
@@ -1252,6 +1276,7 @@ app.get("/api/trovaTuttiProdottiScontati", (req, res) => {
             res.sendStatus(500);
             return;
         };
+        res.status(200);
         res.json(results);
         return;
     })
@@ -1278,7 +1303,6 @@ app.get("/api/trovaTuttiProdottiScontati", (req, res) => {
  */
 app.get("/api/trovaTuttiProdottiScontatiFiltroCategoria", (req, res) => {
     var Categoria = req.query.Categoria;
-    console.log(req.body);
     var sql = "SELECT DISTINCT p.Nome, p.Immagine, p.Categoria, p.IDProdotto, n.Nome as Negozio, s.Valore AS Sconto, sp.Prezzo FROM prodotto p, sconto s, storicoprezzi sp, validita_sconto_prodotto vsp, validita_sconto_categoria vsc, negozio n WHERE p.NegozioProvenienza = s.Negozio AND ((vsp.prodotto = p.IDProdotto AND vsp.Sconto = s.IDSconto) OR (vsc.CategoriaApplicabile = p.Categoria AND vsc.IDSconto = s.IDSconto)) AND p.IDProdotto = sp.Prodotto AND CURRENT_DATE() >= s.DataInizio AND CURRENT_DATE() <= s.DataFine AND p.Categoria = '" + Categoria + "' AND p.NegozioProvenienza = n.IDNegozio GROUP BY p.IDProdotto HAVING MAX(sp.Data)"
     con.query(sql, function(err, results){
         if(err){
@@ -1286,6 +1310,7 @@ app.get("/api/trovaTuttiProdottiScontatiFiltroCategoria", (req, res) => {
             res.sendStatus(500);
             return;
         };
+        res.status(200);
         res.json(results);
         return;
     })
@@ -1319,6 +1344,7 @@ app.get("/api/trovaProdottiFiltroNome", (req, res) => {
             res.sendStatus(500);
             return;
         };
+        res.status(200);
         res.json(results);
         return;
     })
@@ -1352,6 +1378,7 @@ app.get("/api/trovaProdottoFiltroID", (req, res) => {
             res.sendStatus(500);
             return;
         };
+        res.status(200);
         res.json(results);
         return;
     })
@@ -1385,6 +1412,7 @@ app.get("/api/trovaProdottiFiltroNegozio", (req, res) => {
             res.sendStatus(500);
             return;
         };
+        res.status(200);
         res.json(results);
         return;
     })
@@ -1418,6 +1446,7 @@ app.get("/api/trovaProdottiFiltroCategoria", (req, res) => {
             res.sendStatus(500);
             return;
         };
+        res.status(200);
         res.json(results);
         return;
     })
@@ -1455,8 +1484,7 @@ app.delete("/api/eliminaUtente", (req, res) => {
                 res.sendStatus(500);
                 return;
             };
-            res.status(200);
-            res.redirect('back');
+            res.redirect(204, 'back');
             return;
         });
     }
@@ -1471,6 +1499,12 @@ app.delete("/api/eliminaUtente", (req, res) => {
  */
 app.get("/api/ripristinoPassword", (req, res) => {
     //Usa GMail e Auth0
+    if(req.session.user != undefined){
+        res.sendStatus(200);
+    }
+    else{
+        res.sendStatus(403);
+    }
 })
 
 /**
@@ -1509,8 +1543,7 @@ app.patch("/api/attiva2AF", (req, res) => {
                 res.sendStatus(500);
                 return;
             };
-            res.status(200);
-            res.redirect('back');
+            res.redirect(303, 'back');
             return;
         });
     }
@@ -1566,19 +1599,22 @@ app.patch("/api/modificaPassword", (req, res) => {
                         res.sendStatus(500);
                         return;
                     };
-                    res.status(200);
-                    res.redirect('back');
+                    if(req.headers.accept != undefined && req.headers.accept.includes("text/html")){
+                        res.redirect(303, 'back');
+                        return;
+                    }
+                    res.sendStatus(204);
                     return;
                 });
             }
             else{
-                res.send("Password vecchia sbagliata");
+                res.sendStatus(400);
                 return;
             }
         });
     }
     else{
-        res.send("Privilegi insufficenti");
+        res.sendStatus(403);
         return;
     }
 })
@@ -1620,8 +1656,11 @@ app.patch("/api/modificaEmail", (req, res) => {
                 res.sendStatus(500);
                 return;
             };
-            res.status(200);
-            res.redirect('back');
+            if(req.headers.accept != undefined && req.headers.accept.includes("text/html")){
+                res.redirect(303, 'back');
+                return;
+            }
+            res.sendStatus(204);
             return;
         });
     }
@@ -1662,8 +1701,11 @@ app.patch("/api/modificaNumeroTelefono", (req, res) => {
                 res.sendStatus(500);
                 return;
             };
-            res.status(200);
-            res.redirect('back');
+            if(req.headers.accept != undefined && req.headers.accept.includes("text/html")){
+                res.redirect(303, 'back');
+                return;
+            }
+            res.sendStatus(204);
             return;
         });
     }
@@ -1704,8 +1746,11 @@ app.patch("/api/modificaFotoProfilo", (req, res) => {
                 res.sendStatus(500);
                 return;
             };
-            res.status(200);
-            res.redirect('back');
+            if(req.headers.accept != undefined && req.headers.accept.includes("text/html")){
+                res.redirect(303, 'back');
+                return;
+            }
+            res.sendStatus(204);
             return;
         });
     }
@@ -1737,6 +1782,14 @@ app.patch("/api/modificaFotoProfilo", (req, res) => {
 app.post("/api/aggiungiProdottoAiPreferiti", (req, res) => {
     var Username = req.session.user;
     var IDProdotto = req.body.IDProdotto;
+    if(Username == undefined){
+        res.sendStatus(403);
+        return;
+    }
+    if(IDProdotto == undefined){
+        res.sendStatus(400);
+        return;
+    }
     console.log("body:");
     console.log(req.body);
     var sql = "INSERT INTO prodottipreferiti (Prodotto, Utente) VALUES ('" + IDProdotto + "', '" + Username + "')";
@@ -1746,7 +1799,7 @@ app.post("/api/aggiungiProdottoAiPreferiti", (req, res) => {
             res.sendStatus(500);
             return;
         };
-        res.json(results);
+        res.sendStatus(204);
         return;
     })
 })
@@ -1777,6 +1830,14 @@ app.post("/api/aggiungiProdottoAiPreferiti", (req, res) => {
 app.delete("/api/rimuoviProdottoDaiPreferiti", (req, res) => {
     var Username = req.session.user;
     var IDProdotto = req.body.IDProdotto;
+    if(Username == undefined){
+        res.sendStatus(403);
+        return;
+    }
+    if(IDProdotto == undefined){
+        res.sendStatus(400);
+        return;
+    }
     console.log("body remove:");
     console.log(req.body);
     var sql = "DELETE FROM prodottipreferiti WHERE Prodotto = '" + IDProdotto + "' AND Utente = '" + Username + "'";
@@ -1786,7 +1847,7 @@ app.delete("/api/rimuoviProdottoDaiPreferiti", (req, res) => {
             res.sendStatus(500);
             return;
         };
-        res.json(results);
+        res.sendStatus(204);
         return;
     })
 })
@@ -1817,6 +1878,14 @@ app.delete("/api/rimuoviProdottoDaiPreferiti", (req, res) => {
 app.post("/api/aggiungiNegozioAiPreferiti", (req, res) => {
     var Username = req.session.user;
     var IDNegozio = req.body.IDNegozio;
+    if(Username == undefined){
+        res.sendStatus(403);
+        return;
+    }
+    if(IDNegozio == undefined){
+        res.sendStatus(400);
+        return;
+    }
     var sql = "INSERT INTO negozipreferiti (Negozio, Utente) VALUES ('" + IDNegozio + "', '" + Username + "')";
     con.query(sql, function(err, results){
         if(err){
@@ -1824,7 +1893,7 @@ app.post("/api/aggiungiNegozioAiPreferiti", (req, res) => {
             res.sendStatus(500);
             return;
         };
-        res.json(results);
+        res.sendStatus(204);
         return;
     })
 })
@@ -1855,6 +1924,14 @@ app.post("/api/aggiungiNegozioAiPreferiti", (req, res) => {
 app.delete("/api/rimuoviNegozioDaiPreferiti", (req, res) => {
     var Username = req.session.user;
     var IDNegozio = req.body.IDNegozio;
+    if(Username == undefined){
+        res.sendStatus(403);
+        return;
+    }
+    if(IDNegozio == undefined){
+        res.sendStatus(400);
+        return;
+    }
     var sql = "DELETE FROM negozipreferiti WHERE Negozio = '" + IDNegozio + "' AND Utente = '" + Username + "'";
     con.query(sql, function(err, results){
         if(err){
@@ -1862,7 +1939,7 @@ app.delete("/api/rimuoviNegozioDaiPreferiti", (req, res) => {
             res.sendStatus(500);
             return;
         };
-        res.json(results);
+        res.sendStatus(204);
         return;
     })
 })
@@ -1897,12 +1974,14 @@ app.get("/api/ottieniDatiUtente", (req, res) => {
                 res.sendStatus(500);
                 return;
             };
-            res.send(results);
+            res.status(200);
+            res.json(results);
             return;
         });
     }
     else{
-        res.send("Privilegi insufficenti");
+        res.sendStatus(403);
+        return;
     }
 })
 
@@ -1930,12 +2009,13 @@ app.get("/api/trovaTuttiUtenti", (req, res) => {
                 res.sendStatus(500);
                 return;
             };
-            res.send(results);
+            res.json(results);
             return;
         });
     }
     else{
-        res.send("Privilegi insufficenti");
+        res.sendStatus(403);
+        return;
     }
 })
 
@@ -1968,12 +2048,14 @@ app.get("/api/ottieniProdottiPreferiti", (req, res) => {
                 res.sendStatus(500);
                 return;
             };
+            res.status(200);
             res.json(results);
             return;
         })
     }
     else{
-        res.send("Richiesta inviata senza aver effettuato il login");
+        res.sendStatus(403);
+        return;
     }
 })
 
@@ -2011,12 +2093,14 @@ app.get("/api/checkProdottoPreferito", (req, res) => {
                 res.sendStatus(500);
                 return;
             };
+            res.status(200);
             res.json(results);
             return;
         })
     }
     else{
-        res.send("Richiesta inviata senza aver effettuato il login");
+        res.sendStatus(403);
+        return;
     }
 })
 
@@ -2039,7 +2123,7 @@ app.get("/api/checkProdottoPreferito", (req, res) => {
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
-app.get("/api/ottieniNegoziPreferiti", (req, res) => {
+app.get("/api/ottieniNegozioPreferito", (req, res) => {
     if(req.session.user != null){
         var user = req.session.user;
         var sql = "SELECT * FROM negozio n, negozipreferiti np WHERE n.IDNegozio = np.Negozio AND np.Utente = '" + user + "'";
@@ -2049,12 +2133,14 @@ app.get("/api/ottieniNegoziPreferiti", (req, res) => {
                 res.sendStatus(500);
                 return;
             };
+            res.status(200);
             res.json(results);
             return;
         })
     }
     else{
-        res.send("Richiesta inviata senza aver effettuato il login");
+        res.sendStatus(403);
+        return;
     }
 })
 
@@ -2097,7 +2183,8 @@ app.get("/api/checkNegozioPreferito", (req, res) => {
         })
     }
     else{
-        res.send("Richiesta inviata senza aver effettuato il login");
+        res.sendStatus(403);
+        return;
     }
 })
 
@@ -2162,13 +2249,17 @@ app.post("/api/salvaRecensione", (req, res) => {
                 res.sendStatus(500);
                 return;
             };
-            res.status(200);
-            res.redirect('back');
+            res.status(201);
+            if(req.headers.accept != undefined && req.headers.accept.includes("text/html")){
+                res.redirect('back');
+                return;
+            }
+            res.json(results);
             return;
         })
     }
     else{
-        res.send("Richiesta inviata senza aver effettuato il login");
+        res.sendStatus(403);
     }
 })
 
@@ -2202,6 +2293,10 @@ app.delete("/api/eliminaRecensione", (req, res) => {
         var User = req.session.user;
         if(req.session.isAdmin || User == req.body.Username){
             var IDRecensione = req.body.IDRecensione;
+            if(IDRecensione == undefined){
+                res.sendStatus(400);
+                return;
+            }
             var sql = "DELETE FROM recensione WHERE IDRecensione = '" + IDRecensione + "'";
             con.query(sql, function(err, results){
                 if(err){
@@ -2209,16 +2304,19 @@ app.delete("/api/eliminaRecensione", (req, res) => {
                     res.sendStatus(500);
                     return;
                 };
+                res.status(204);
                 res.json(results);
                 return;
             })
         }
         else{
-            res.send("Permessi insufficenti");
+            res.sendStatus(403);
+            return;
         }
     }
     else{
-        res.send("Richiesta inviata senza aver effettuato il login");
+        res.sendStatus(403);
+        return;
     }
 })
 

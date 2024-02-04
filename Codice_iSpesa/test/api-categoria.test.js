@@ -14,7 +14,7 @@ afterAll(() => {
     server.close();
 })
 
-describe('Suite testing API categorie', () => {
+describe('Suite testing API categoria', () => {
     test("Chiamata all'API GET '/api/categorie'", async () => {
         const response = await request("http://localhost:" + port).get("/api/categorie");
         expect(response.statusCode).toEqual(200);

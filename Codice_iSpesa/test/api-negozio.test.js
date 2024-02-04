@@ -16,7 +16,7 @@ afterAll(() => {
     server.close();
 })
 
-describe('Suite testing API negozi', () => {
+describe('Suite testing API negozio', () => {
 
     const inputBody = {
         Ubicazione : "Trento",
@@ -27,8 +27,8 @@ describe('Suite testing API negozi', () => {
     }
 
     const adminUser = {
-        username : "root",
-        password : "",
+        Username : "root",
+        Password : "",
     }
 
     testSession = session("http://localhost:" + port);
@@ -39,7 +39,7 @@ describe('Suite testing API negozi', () => {
     })
 
     it('should authenticate as admin', async () => {
-        await testSession.post("/login").send(adminUser).expect(200); //Logs as admin
+        await testSession.post("/login").send(adminUser).expect(303); //Logs as admin
     })
 
     test("Chiamata all'API POST '/api/salvaNegozio'", async () => {
