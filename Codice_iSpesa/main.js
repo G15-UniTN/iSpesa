@@ -1178,7 +1178,7 @@ app.post("/api/modificaImmagine", (req, res) => {
             res.sendStatus(500);
             return;
         };
-        res.sendStatus(201);
+        res.sendStatus(204);
         return;
     });      
 })
