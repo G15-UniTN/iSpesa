@@ -315,30 +315,49 @@ app.post("/api/salvaSconto", (req, res) => {
     var Negozio = req.body.Negozio;
     var DataInizio = req.body.DataInizio;
     var DataFine = req.body.DataFine;
-    sql = "INSERT INTO sconto (Valore, Negozio, DataInizio, DataFine) VALUES ('" + Valore + "','" + Negozio + "','" + DataInizio + "'" + DataFine + "')";
-    con.query(sql, function(err, results){
-        if(err){
-            console.log(err);
-            res.sendStatus(500);
+    if(req.session.isAdmin){
+        if(Valore == undefined || Negozio == undefined || DataInizio == undefined || DataFine == undefined){
+            res.sendStatus(400);
             return;
-        };
-        res.send("Aggiunto");
-        return;
-    });
+        }
+        sql = "INSERT INTO sconto (Valore, Negozio, DataInizio, DataFine) VALUES ('" + Valore + "','" + Negozio + "','" + DataInizio + "'" + DataFine + "')";
+        con.query(sql, function(err, results){
+            if(err){
+                console.log(err);
+                res.sendStatus(500);
+                return;
+            };
+            res.status(201);
+            res.json(results);
+            return;
+        });    
+    }
+    else{
+        res.sendStatus(403);
+    }
 })
 
 app.delete("/api/eliminaSconto", (req, res) => {
     var IDSconto = req.body.IDSconto;
-    sql = "DELETE FROM sconto WHERE IDSconto = '" + IDSconto + "'";
-    con.query(sql, function(err, results){
-        if(err){
-            console.log(err);
-            res.sendStatus(500);
+    if(req.session.isAdmin){
+        if(IDSconto == undefined){
+            res.sendStatus(400);
             return;
-        };
-        res.send("Rimosso");
-        return;
-    });
+        }
+        sql = "DELETE FROM sconto WHERE IDSconto = '" + IDSconto + "'";
+        con.query(sql, function(err, results){
+            if(err){
+                console.log(err);
+                res.sendStatus(500);
+                return;
+            };
+            res.sendStatus(204);
+            return;
+        });    
+    }
+    else{
+        res.sendStatus(403);
+    }
 })
 
 app.get("/api/trovaTuttiSconti", (req, res) => {
@@ -349,20 +368,7 @@ app.get("/api/trovaTuttiSconti", (req, res) => {
             res.sendStatus(500);
             return;
         };
-        res.json(results);
-        return;
-    });
-})
-
-app.get("/api/trovaScontiFiltroNegozio", (req, res) => {
-    var Negozio = req.query.Negozio;
-    sql = "SELECT s.Valore, s.IDSconto, n.IDNegozio, s.DataInizio, s.DataFine, n.Nome AS Negozio, n.Logo FROM sconto s, negozio n WHERE s.Negozio = n.IDNegozio AND n.IDNegozio = '" + Negozio + "'";
-    con.query(sql, function(err, results){
-        if(err){
-            console.log(err);
-            res.sendStatus(500);
-            return;
-        };
+        res.status(200);
         res.json(results);
         return;
     });
@@ -376,6 +382,7 @@ app.get("/api/trovaScontiConCategoria", (req, res) => {
             res.sendStatus(500);
             return;
         };
+        res.status(200);
         res.json(results);
         return;
     });
@@ -390,6 +397,7 @@ app.get("/api/trovaScontiConCategoriaFiltroNegozio", (req, res) => {
             res.sendStatus(500);
             return;
         };
+        res.status(200);
         res.json(results);
         return;
     });
@@ -403,6 +411,7 @@ app.get("/api/trovaScontiConProdotto", (req, res) => {
             res.sendStatus(500);
             return;
         };
+        res.status(200);
         res.json(results);
         return;
     });
@@ -417,6 +426,7 @@ app.get("/api/trovaScontiConProdottoFiltroNegozio", (req, res) => {
             res.sendStatus(500);
             return;
         };
+        res.status(200);
         res.json(results);
         return;
     });
