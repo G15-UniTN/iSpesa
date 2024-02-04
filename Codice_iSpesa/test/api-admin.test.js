@@ -16,7 +16,7 @@ afterAll(() => {
     server.close();
 })
 
-describe('Suite testing API utente_registrato', () => {
+describe('Suite testing API admin su utente_registrato', () => {
 
     const inputBody = {
         Username : "test_user",
@@ -123,3 +123,4 @@ describe('Suite testing API utente_registrato', () => {
         expect(response.statusCode).toEqual(204);
     })
 })
+

@@ -167,6 +167,9 @@ app.get("/signup", (req, res) => {
     res.render('signup.hbs');
 })
 
+app.get("/password_dimenticata", (req, res) => {
+    res.render('password_dimenticata.hbs');
+})
 
 app.get("/prodotto", (req, res) => {
     if(req.query.IDProdotto == null){
@@ -346,16 +349,27 @@ app.post("/api/salvaVolantino", (req, res) => {
     var Negozio = req.body.Negozio;
     var DataFine = req.body.DataFine;
     var VolantinoFile = req.body.VolantinoFile;
-    sql = "INSERT INTO volantino (Negozio, DataFine, VolantinoFile) VALUES ('" + Negozio + "','" + DataFine + "','" + VolantinoFile +"')";
-    con.query(sql, function(err, results){
-        if(err){
-            console.log(err);
-            res.sendStatus(500);
+    if(req.session.isAdmin){
+        if(Negozio == undefined || DataFine == undefined || VolantinoFile == undefined){
+            res.sendStatus(400);
             return;
-        };
-        res.send("Aggiunto");
+        }
+        sql = "INSERT INTO volantino (Negozio, DataFine, VolantinoFile) VALUES ('" + Negozio + "','" + DataFine + "','" + VolantinoFile +"')";
+        con.query(sql, function(err, results){
+            if(err){
+                console.log(err);
+                res.sendStatus(500);
+                return;
+            };
+            res.status(201);
+            res.json(results);
+            return;
+        });    
+    }
+    else{
+        res.sendStatus(403);
         return;
-    });
+    }
 })
 /**
  * @swagger
@@ -379,15 +393,25 @@ app.post("/api/salvaVolantino", (req, res) => {
 app.delete("/api/eliminaVolantino", (req, res) => {
     var IDVolantino = req.body.IDVolantino;
     sql = "DELETE FROM volantino WHERE IDVolantino = '" + IDVolantino + "'";
-    con.query(sql, function(err, results){
-        if(err){
-            console.log(err);
-            res.sendStatus(500);
+    if(req.session.isAdmin){
+        if(IDVolantino == undefined){
+            res.sendStatus(400);
             return;
-        };
-        res.send("Rimosso");
+        }
+        con.query(sql, function(err, results){
+            if(err){
+                console.log(err);
+                res.sendStatus(500);
+                return;
+            };
+            res.sendStatus(204);
+            return;
+        });    
+    }
+    else{
+        res.sendStatus(403);
         return;
-    });
+    }
 })
 
 /**
@@ -412,6 +436,7 @@ app.get("/api/trovaTuttiVolantini", (req, res) => {
             res.sendStatus(500);
             return;
         };
+        res.status(200);
         res.json(results);
         return;
     });
@@ -442,6 +467,7 @@ app.get("/api/trovaVolantiniFiltroNegozio", (req, res) => {
             res.sendStatus(500);
             return;
         };
+        res.status(200);
         res.json(results);
         return;
     });
@@ -2259,7 +2285,7 @@ app.post("/api/salvaRecensione", (req, res) => {
         var Testo = req.body.Testo;
         var Negozio = req.body.IDNegozio;
         if(N_stelle < 1 || N_stelle > 5){
-            res.send("Invio errato");
+            res.sendStatus(400);
             return;
         }
         var sql = "INSERT INTO recensione (Titolo, Testo, N_stelle, Utente, Negozio) VALUES ('" + Titolo + "', '" + Testo + "', '" + N_stelle + "','" + Username + "','" + Negozio + "')";
@@ -2280,6 +2306,7 @@ app.post("/api/salvaRecensione", (req, res) => {
     }
     else{
         res.sendStatus(403);
+        return;
     }
 })
 
@@ -2325,6 +2352,10 @@ app.delete("/api/eliminaRecensione", (req, res) => {
                     res.sendStatus(500);
                     return;
                 };
+                if(req.headers.accept != undefined && req.headers.accept.includes("text/html")){
+                    res.redirect(303, 'back');
+                    return;
+                }
                 res.status(204);
                 res.json(results);
                 return;

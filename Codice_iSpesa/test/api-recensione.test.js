@@ -21,7 +21,7 @@ describe('Suite testing API recensione', () => {
     const inputBody = {
         Titolo: "Titolo Test",
         Testo: "Testo test",
-        N_stelle: "",
+        Stelle: "",
         Data_creazione: "1970-01-01",
         Utente: "root",
         IDNegozio: "1",
@@ -44,7 +44,14 @@ describe('Suite testing API recensione', () => {
         await testSession.post("/login").send(adminUser).expect(303); //Logs as admin
     })
 
+    test("Chiamata all'API POST '/api/salvaRecensione' con recensione errata (numero di stelle = -1)", async () => {
+        inputBody.Stelle = "-1";
+        const response = await testSession.post("/api/salvaRecensione").send(inputBody);
+        expect(response.statusCode).toEqual(400);
+    })
+
     test("Chiamata all'API POST '/api/salvaRecensione'", async () => {
+        inputBody.Stelle = "1";
         const response = await testSession.post("/api/salvaRecensione").send(inputBody);
         expect(response.statusCode).toEqual(201);
         inputBody.IDRecensione = response.body.insertId;
