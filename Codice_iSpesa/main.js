@@ -2086,7 +2086,6 @@ app.delete("/api/rimuoviNegozioDaiPreferiti", (req, res) => {
  *         type: string
  *         description: Username dell'Utente desiderato.
  *      responses:
- *      responses:
  *          200:
  *              description: OK. Dati ottenuti con successo.
  *          403:
@@ -2595,6 +2594,7 @@ app.get("/api/trovaTutteRecensioni", (req, res) => {
  */
 app.get("/api/inviaMail", (req, res) => {
     //GMail API
+    res.sendStatus(200);
 })
 
 //Categoria
