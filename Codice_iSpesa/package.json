@@ -4,7 +4,7 @@
   "description": "Implementazione della nostra WebApp iSpesa",
   "main": "main.js",
   "scripts": {
-    "test": "jest --coverage --detectOpenHandles",
+    "test": "jest --coverage --detectOpenHandles --silent",
     "start": "node server.js"
   },
   "dependencies": {

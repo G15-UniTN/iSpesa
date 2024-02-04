@@ -53,30 +53,25 @@ describe('Suite testing API negozi', () => {
         expect(response.statusCode).toEqual(200);
     })
 
-    test("Chiamata all'API GET '/api/trovaTuttiSconti'", async () => {
-        const response = await testSession.get("/api/trovaTuttiSconti");
+    test("Chiamata all'API GET '/api/trovaScontiConProdotto'", async () => {
+        const response = await testSession.get("/api/trovaScontiConProdotto");
         expect(response.statusCode).toEqual(200);
     })
 
-    test("Chiamata all'API GET '/api/trovaTuttiScontiConProdotto'", async () => {
-        const response = await testSession.get("/api/trovaTuttiScontiConProdotto");
+    test("Chiamata all'API GET '/api/trovaScontiConCategoria'", async () => {
+        const response = await testSession.get("/api/trovaScontiConCategoria");
         expect(response.statusCode).toEqual(200);
     })
 
-    test("Chiamata all'API GET '/api/trovaTuttiScontiConCategoria'", async () => {
-        const response = await testSession.get("/api/trovaTuttiScontiConProdotto");
-        expect(response.statusCode).toEqual(200);
-    })
-
-    test("Chiamata all'API GET '/api/trovaTuttiScontiConProdottoFiltroNegozio'", async () => {
+    test("Chiamata all'API GET '/api/trovaScontiConProdottoFiltroNegozio'", async () => {
         const IDNegozio = "1";
-        const response = await testSession.get("/api/trovaTuttiScontiConProdottoFiltroNegozio?IDNegozio="+IDNegozio);
+        const response = await testSession.get("/api/trovaScontiConProdottoFiltroNegozio?IDNegozio="+IDNegozio);
         expect(response.statusCode).toEqual(200);
     })
 
-    test("Chiamata all'API GET '/api/trovaTuttiScontiConCategoriaFiltroNegozio'", async () => {
+    test("Chiamata all'API GET '/api/trovaScontiConCategoriaFiltroNegozio'", async () => {
         const IDNegozio = "1";
-        const response = await testSession.get("/api/trovaTuttiScontiConCategoriaFiltroNegozio?IDNegozio="+IDNegozio);
+        const response = await testSession.get("/api/trovaScontiConCategoriaFiltroNegozio?IDNegozio="+IDNegozio);
         expect(response.statusCode).toEqual(200);
     })
 

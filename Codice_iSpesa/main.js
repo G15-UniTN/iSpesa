@@ -219,7 +219,6 @@ app.post("/login", (req, res) => {
                 req.session.user = username;
                 if(result[0].isAdmin){
                     req.session.isAdmin = true;
-                    console.log(req.session);
                 }
                 else{
                     req.session.isAdmin = false;
@@ -496,7 +495,7 @@ app.post("/api/salvaSconto", (req, res) => {
             res.sendStatus(400);
             return;
         }
-        sql = "INSERT INTO sconto (Valore, Negozio, DataInizio, DataFine) VALUES ('" + Valore + "','" + Negozio + "','" + DataInizio + "'" + DataFine + "')";
+        sql = "INSERT INTO sconto (Valore, Negozio, DataInizio, DataFine) VALUES ('" + Valore + "','" + Negozio + "','" + DataInizio + "','" + DataFine + "')";
         con.query(sql, function(err, results){
             if(err){
                 console.log(err);
