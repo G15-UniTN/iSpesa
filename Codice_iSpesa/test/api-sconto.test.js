@@ -38,8 +38,19 @@ describe('Suite testing API sconto', () => {
         expect(response.statusCode).toEqual(403);
     })
 
+    test("Chiamata all'API DELETE '/api/eliminaSconto' da un utente non admin", async () => {
+        const response = await testSession.post("/api/eliminaSconto?_method=DELETE").send(inputBody);
+        expect(response.statusCode).toEqual(403);
+    })
+
     it('should authenticate as admin', async () => {
         await testSession.post("/login").send(adminUser).expect(303); //Logs as admin
+    })
+
+    test("Chiamata all'API POST '/api/salvaSconto' senza dati", async () => {
+        const response = await testSession.post("/api/salvaSconto");
+        expect(response.statusCode).toEqual(400);
+        inputBody.IDSconto = response.body.insertId;
     })
 
     test("Chiamata all'API POST '/api/salvaSconto'", async () => {
@@ -73,6 +84,11 @@ describe('Suite testing API sconto', () => {
         const IDNegozio = "1";
         const response = await testSession.get("/api/trovaScontiConCategoriaFiltroNegozio?IDNegozio="+IDNegozio);
         expect(response.statusCode).toEqual(200);
+    })
+
+    test("Chiamata all'API DELETE '/api/eliminaSconto' senza dati", async () => {
+        const response = await testSession.post("/api/eliminaSconto?_method=DELETE");
+        expect(response.statusCode).toEqual(400);
     })
 
     test("Chiamata all'API DELETE '/api/eliminaSconto'", async () => {

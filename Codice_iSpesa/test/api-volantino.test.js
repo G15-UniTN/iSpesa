@@ -33,12 +33,23 @@ describe('Suite testing API sconto', () => {
     testSession = session("http://localhost:" + port);
 
     test("Chiamata all'API POST '/api/salvaVolantino' da un utente non admin", async () => {
-        const response = await testSession.post("/api/salvaSconto").send(inputBody);
+        const response = await testSession.post("/api/salvaVolantino").send(inputBody);
+        expect(response.statusCode).toEqual(403);
+    })
+
+    test("Chiamata all'API DELETE '/api/eliminaVolantino' da un utente non admin", async () => {
+        const response = await testSession.post("/api/eliminaVolantino?_method=DELETE").send(inputBody);
         expect(response.statusCode).toEqual(403);
     })
 
     it('should authenticate as admin', async () => {
         await testSession.post("/login").send(adminUser).expect(303); //Logs as admin
+    })
+
+    test("Chiamata all'API POST '/api/salvaVolantino' senza dati", async () => {
+        const response = await testSession.post("/api/salvaVolantino");
+        expect(response.statusCode).toEqual(400);
+        inputBody.IDVolantino = response.body.insertId;
     })
 
     test("Chiamata all'API POST '/api/salvaVolantino'", async () => {
@@ -56,6 +67,11 @@ describe('Suite testing API sconto', () => {
         const IDNegozio = inputBody.Negozio;
         const response = await testSession.get("/api/trovaVolantiniFiltroNegozio?IDNegozio="+IDNegozio);
         expect(response.statusCode).toEqual(200);
+    })
+
+    test("Chiamata all'API DELETE '/api/eliminaVolantino' senza dati", async () => {
+        const response = await testSession.post("/api/eliminaVolantino?_method=DELETE");
+        expect(response.statusCode).toEqual(400);
     })
 
     test("Chiamata all'API DELETE '/api/eliminaVolantino'", async () => {

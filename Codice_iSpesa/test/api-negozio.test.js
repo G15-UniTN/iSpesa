@@ -38,8 +38,30 @@ describe('Suite testing API negozio', () => {
         expect(response.statusCode).toEqual(403);
     })
 
+    test("Chiamata all'API PATCH '/api/modificaUbicazione' da un utente non admin", async () => {
+        inputBody.Ubicazione = "Ubicazione_test";
+        const response = await testSession.post("/api/modificaUbicazione?_method=PATCH").send(inputBody);
+        expect(response.statusCode).toEqual(403);
+    })
+
+    test("Chiamata all'API PATCH '/api/modificaOrario' da un utente non admin", async () => {
+        inputBody.Orari = "Ubicazione_test";
+        const response = await testSession.post("/api/modificaOrari?_method=PATCH").send(inputBody);
+        expect(response.statusCode).toEqual(403);
+    })
+
+    test("Chiamata all'API DELETE '/api/eliminaNegozio' da un utente non admin", async () => {
+        const response = await testSession.post("/api/eliminaNegozio?_method=DELETE").send(inputBody);
+        expect(response.statusCode).toEqual(403);
+    })
+
     it('should authenticate as admin', async () => {
         await testSession.post("/login").send(adminUser).expect(303); //Logs as admin
+    })
+
+    test("Chiamata all'API POST '/api/salvaNegozio' senza dati", async () => {
+        const response = await testSession.post("/api/salvaNegozio");
+        expect(response.statusCode).toEqual(400);
     })
 
     test("Chiamata all'API POST '/api/salvaNegozio'", async () => {
@@ -71,16 +93,31 @@ describe('Suite testing API negozio', () => {
         expect(response.statusCode).toEqual(200);
     })
 
+    test("Chiamata all'API PATCH '/api/modificaUbicazione' senza dati", async () => {
+        const response = await testSession.post("/api/modificaUbicazione?_method=PATCH");
+        expect(response.statusCode).toEqual(400);
+    })
+
     test("Chiamata all'API PATCH '/api/modificaUbicazione'", async () => {
         inputBody.Ubicazione = "Ubicazione_test";
         const response = await testSession.post("/api/modificaUbicazione?_method=PATCH").send(inputBody);
         expect(response.statusCode).toEqual(204);
     })
 
+    test("Chiamata all'API PATCH '/api/modificaOrario' senza dati", async () => {
+        const response = await testSession.post("/api/modificaOrari?_method=PATCH");
+        expect(response.statusCode).toEqual(400);
+    })
+
     test("Chiamata all'API PATCH '/api/modificaOrario'", async () => {
         inputBody.Orari = "Ubicazione_test";
         const response = await testSession.post("/api/modificaOrari?_method=PATCH").send(inputBody);
         expect(response.statusCode).toEqual(204);
+    })
+
+    test("Chiamata all'API DELETE '/api/eliminaNegozio' senza dati", async () => {
+        const response = await testSession.post("/api/eliminaNegozio?_method=DELETE");
+        expect(response.statusCode).toEqual(400);
     })
 
     test("Chiamata all'API DELETE '/api/eliminaNegozio'", async () => {

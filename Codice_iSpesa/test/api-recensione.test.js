@@ -23,7 +23,7 @@ describe('Suite testing API recensione', () => {
         Testo: "Testo test",
         Stelle: "",
         Data_creazione: "1970-01-01",
-        Utente: "root",
+        Username: "root",
         IDNegozio: "1",
         IDRecensione: "",
     }
@@ -72,6 +72,11 @@ describe('Suite testing API recensione', () => {
         const Username = inputBody.Utente;
         const response = await testSession.get("/api/trovaNegozioFiltroID?Username="+Username);
         expect(response.statusCode).toEqual(200);
+    })
+
+    test("Chiamata all'API DELETE '/api/eliminaRecensione' senza dati", async () => {
+        const response = await testSession.post("/api/eliminaRecensione?_method=DELETE");
+        expect(response.statusCode).toEqual(400);
     })
 
     test("Chiamata all'API DELETE '/api/eliminaRecensione'", async () => {

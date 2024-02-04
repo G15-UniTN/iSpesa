@@ -43,6 +43,11 @@ describe('Suite testing API prodotto', () => {
         await testSession.post("/login").send(adminUser).expect(303); //Logs as admin
     })
 
+    test("Chiamata all'API POST '/api/salvaProdotto' senza dati", async () => {
+        const response = await testSession.post("/api/salvaProdotto");
+        expect(response.statusCode).toEqual(400);
+    })
+
     test("Chiamata all'API POST '/api/salvaProdotto'", async () => {
         const response = await testSession.post("/api/salvaProdotto").send(inputBody);
         expect(response.statusCode).toEqual(201);
@@ -67,7 +72,7 @@ describe('Suite testing API prodotto', () => {
 
     test("Chiamata all'API GET '/api/trovaProdottiFiltroNome'", async () => {
         const Nome = inputBody.Nome;
-        const response = await testSession.get("/api/trovaScontiConProdottoFiltroNegozio?Nome="+Nome);
+        const response = await testSession.get("/api/trovaProdottiFiltroNome?Nome="+Nome);
         expect(response.statusCode).toEqual(200);
     })
 
@@ -78,8 +83,8 @@ describe('Suite testing API prodotto', () => {
     })
 
     test("Chiamata all'API GET '/api/trovaProdottiFiltroNegozio'", async () => {
-        const Negozio = inputBody.Negozio;
-        const response = await testSession.get("/api/trovaProdottoFiltroID?IDProdotto="+Negozio);
+        const IDNegozio = inputBody.IDNegozio;
+        const response = await testSession.get("/api/trovaProdottiFiltroNegozio?IDNegozio="+IDNegozio);
         expect(response.statusCode).toEqual(200);
     })
 
@@ -89,10 +94,31 @@ describe('Suite testing API prodotto', () => {
         expect(response.statusCode).toEqual(200);
     })
 
+    test("Chiamata all'API PATCH '/api/modificaImmagine' senza dati", async () => {
+        const response = await testSession.post("/api/modificaImmagine?_method=PATCH");
+        expect(response.statusCode).toEqual(400);
+    })
+
+    test("Chiamata all'API PATCH '/api/modificaImmagine'", async () => {
+        inputBody.Immagine = "/nuova_immagine_test.png";
+        const response = await testSession.post("/api/modificaImmagine?_method=PATCH").send(inputBody);
+        expect(response.statusCode).toEqual(204);
+    })
+
+    test("Chiamata all'API POST '/api/aggiungiPrezzo' senza dati", async () => {
+        const response = await testSession.post("/api/aggiungiPrezzo");
+        expect(response.statusCode).toEqual(400);
+    })
+
     test("Chiamata all'API POST '/api/aggiungiPrezzo'", async () => {
         inputBody.Prezzo = "10";
         const response = await testSession.post("/api/aggiungiPrezzo").send(inputBody);
         expect(response.statusCode).toEqual(204);
+    })
+
+    test("Chiamata all'API DELETE '/api/eliminaProdotto' senza IDProdotto", async () => {
+        const response = await testSession.post("/api/eliminaProdotto?_method=DELETE");
+        expect(response.statusCode).toEqual(400);
     })
 
     test("Chiamata all'API DELETE '/api/eliminaProdotto'", async () => {
