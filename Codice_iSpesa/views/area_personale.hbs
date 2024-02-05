@@ -79,7 +79,15 @@
             <h6>Inserisci un'altra foto...</h6>
             
             <input type="file" class="form-control">
-            </div>
+            </div><hr>
+            <h4 style="text-align:center">Invia una segnalazione</h4>
+            <form action="/api/inviaMail" method="GET">
+                <div class="form-group">
+                    <label for="testoSegnalazione">Testo segnalazione</label>
+                    <textarea class="form-control" id="testoSegnalazione" placeholder="Testo segnalazione"></textarea>
+                </div><br>
+                <button type="submit" class="btn btn-primary">Invia</button>
+            </form>    
         </div>
         <div class="col-md-9 personal-info">
             <h3>Informazioni personali</h3>
