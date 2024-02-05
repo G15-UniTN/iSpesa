@@ -317,7 +317,7 @@ app.post("/login", (req, res) => {
  *                  description: Email dell'Utente da registrare.
  *                  example: antonio@povo.com
  *              NumeroTelefono:
- *                  type: int
+ *                  type: string
  *                  description: Numero di Telefono dell'Utente da registrare.
  *                  example: 3334455589
  *      responses:
@@ -1945,7 +1945,7 @@ app.patch("/api/modificaEmail", (req, res) => {
  *         description: Username dell'Utente desiderato.
  *       - in: query
  *         name: TelefonoNuovo
- *         type: int
+ *         type: string
  *         description: Nuovo Numero di Telefono dell'Utente desiderato.
  *      responses:
  *          204:
