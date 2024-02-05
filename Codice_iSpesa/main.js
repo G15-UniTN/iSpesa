@@ -70,9 +70,9 @@ app.set("views", path.join(__dirname, "views"));
 hbs.registerPartials(__dirname + "/views/partials");
 
 var con = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "",
+    host: "93.34.235.73:3306",
+    user: "admin",
+    password: "iSpesaPassword",
     database: "ispesa"
 })
 
