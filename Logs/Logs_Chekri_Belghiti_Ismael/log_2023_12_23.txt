@@ -1,0 +1,2 @@
+Orario di lavoro:19:00-22:00
+-Definizione del database e inizio popolamento
