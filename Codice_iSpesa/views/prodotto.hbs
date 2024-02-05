@@ -121,12 +121,10 @@
             IDProdotto = pair[1];
 
             var request = "/api/trovaProdottoFiltroID?IDProdotto=" + IDProdotto;
-            console.log(request);
 
             fetch(url_sito + request)
             .then(response => response.json())
             .then(data => {
-                console.log(data);
                 var Nome = data[0].Nome;
                 var Immagine = data[0].Immagine;
                 var Categoria = data[0].Categoria;
@@ -176,7 +174,6 @@
                             "Content-type": "application/json; charset=UTF-8"
                         }
                     })
-                    .then(response => response.json())
                     document.getElementById("Stella").src = "/img/sito/stella.webp";
                     preferito = false;
                 }
@@ -191,7 +188,6 @@
                             "Content-type": "application/json; charset=UTF-8"
                         }
                     })
-                    .then(response => response.json())
                     document.getElementById("Stella").src = "/img/sito/stella_gialla.png";
                     preferito = true;
                 }

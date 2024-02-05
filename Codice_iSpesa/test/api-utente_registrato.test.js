@@ -22,7 +22,7 @@ describe('Suite testing API utente_registrato', () => {
         Username : "test_user",
         Password : "Password1!",
         Email : "testemail@test.it",
-        Telefono : "1234567890",
+        Telefono : "123321",
     }
 
     var Username = inputBody.Username;
