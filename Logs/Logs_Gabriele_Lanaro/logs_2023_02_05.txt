@@ -1,0 +1,2 @@
+11:00 - 16:00
+- Lavorato sul testing delle API e D4

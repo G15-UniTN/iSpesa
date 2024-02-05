@@ -1,8 +1,9 @@
-const request = require('supertest');
 const main = require("../main.js");
+const session = require('supertest-session');
 const port = process.env.PORT || 8080;
 
 let server;
+var testSession = null;
 
 beforeAll( async () => {
     jest.setTimeout(20000)
@@ -15,8 +16,11 @@ afterAll(() => {
 })
 
 describe('Suite testing API categoria', () => {
+
+    testSession = session("http://localhost:" + port);
+
     test("Chiamata all'API GET '/api/categorie'", async () => {
-        const response = await request("http://localhost:" + port).get("/api/categorie");
+        const response = await testSession.get("/api/categorie");
         expect(response.statusCode).toEqual(200);
     })
 })
