@@ -282,7 +282,50 @@ app.post("/registrati", (req, res) => {
             return;
         }
         if(result.length > 0){
-            res.redirect(303, "/signup?exists_username=true");
+            /* istanbul ignore next */
+            if(req.headers.accept != undefined && req.headers.accept.includes("text/html")){
+                res.redirect(303, "/signup?errore_inserimento=1");
+                return;
+            }
+            res.sendStatus(400);
+            return;
+        }
+        if(Password.length < 9){
+            /* istanbul ignore next */
+            if(req.headers.accept != undefined && req.headers.accept.includes("text/html")){
+                res.redirect(303, "/signup?errore_inserimento=2");
+                return;
+            }
+            res.sendStatus(400);
+            return;
+        }
+        var format = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
+        if(!format.test(Password)){
+            /* istanbul ignore next */
+            if(req.headers.accept != undefined && req.headers.accept.includes("text/html")){
+                res.redirect(303, "/signup?errore_inserimento=3");
+                return;
+            }
+            res.sendStatus(400);
+            return;
+        }
+        if(Password.toLowerCase() == Password || Password.toUpperCase() == Password){
+            /* istanbul ignore next */
+            if(req.headers.accept != undefined && req.headers.accept.includes("text/html")){
+                res.redirect(303, "/signup?errore_inserimento=4");
+                return;
+            }
+            res.sendStatus(400);
+            return;
+        }
+        format = /[1234567890]+/;
+        if(!format.test(Password)){
+            /* istanbul ignore next */
+            if(req.headers.accept != undefined && req.headers.accept.includes("text/html")){
+                res.redirect(303, "/signup?errore_inserimento=5");
+                return;
+            }
+            res.sendStatus(400);
             return;
         }
         else{

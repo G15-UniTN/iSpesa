@@ -70,7 +70,7 @@
                       <input type="number" class="form-control" id="floatingPhoneNumber" name="Telefono" pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}" placeholder="Numero di telefono">
                       <label for="floatingPhoneNumber">Numero di telefono</label>
                     </div>
-                    <div class="form-floating mb-3">
+                    <div class="form-floating mb-3" id="formPassword">
                       <input type="password" class="form-control" id="floatingPassword" name="Password" placeholder="Password">
                       <label for="floatingPassword">Password</label>
                     </div>
@@ -94,9 +94,41 @@
         var query = window.location.search.substring(1);
         var vars = query.split('&');
         console.log(vars);
-        if(vars[0] == "exists_username=true"){
+        if(vars[0] == "errore_inserimento=1"){
           document.getElementById("floatingUsername").classList.add("is-invalid");
           document.getElementById("floatingUsernameValidation").style.display = true;
+        }
+        if(vars[0] == "errore_inserimento=2"){
+          document.getElementById("floatingPassword").classList.add("is-invalid");
+          let c1 = document.createElement("div");
+          c1.classList.add("invalid-feedback");
+          c1.innerHTML = "La password deve essere più lunga di 8 caratteri"
+          c1.style.display = true;
+          document.getElementById("formPassword").appendChild(c1);
+        }
+        if(vars[0] == "errore_inserimento=3"){
+          document.getElementById("floatingPassword").classList.add("is-invalid");
+          let c1 = document.createElement("div");
+          c1.classList.add("invalid-feedback");
+          c1.innerHTML = "La password deve contenere caratteri speciali"
+          c1.style.display = true;
+          document.getElementById("formPassword").appendChild(c1);
+        }
+        if(vars[0] == "errore_inserimento=4"){
+          document.getElementById("floatingPassword").classList.add("is-invalid");
+          let c1 = document.createElement("div");
+          c1.classList.add("invalid-feedback");
+          c1.innerHTML = "La password deve contenere almeno una lettera maiuscola o minuscola"
+          c1.style.display = true;
+          document.getElementById("formPassword").appendChild(c1);
+        }
+        if(vars[0] == "errore_inserimento=5"){
+          document.getElementById("floatingPassword").classList.add("is-invalid");
+          let c1 = document.createElement("div");
+          c1.classList.add("invalid-feedback");
+          c1.innerHTML = "La password deve contere almeno un numero"
+          c1.style.display = true;
+          document.getElementById("formPassword").appendChild(c1);
         }
       }
     </script>

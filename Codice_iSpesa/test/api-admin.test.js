@@ -20,7 +20,7 @@ describe('Suite testing API admin su utente_registrato', () => {
 
     const inputBody = {
         Username : "test_user",
-        Password : "5423543",
+        Password : "Password1!",
         Email : "testemail@test.it",
         Telefono : "1234567890",
     }

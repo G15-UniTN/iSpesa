@@ -20,7 +20,7 @@ describe('Suite testing API utente_registrato', () => {
 
     const inputBody = {
         Username : "test_user",
-        Password : "5423543",
+        Password : "Password1!",
         Email : "testemail@test.it",
         Telefono : "1234567890",
     }
@@ -34,14 +34,45 @@ describe('Suite testing API utente_registrato', () => {
 
     testSession = session("http://localhost:" + port);
 
+    test("Chiamata all'API POST '/registrati' con password minore di 9 caratteri", async () => {
+        inputBody.Password = "Pass1!";
+        const response = await testSession.post("/registrati").send(inputBody);
+        expect(response.statusCode).toEqual(400);
+    })
+
+    test("Chiamata all'API POST '/registrati' con password senza caratteri speciali", async () => {
+        inputBody.Password = "Password11";
+        const response = await testSession.post("/registrati").send(inputBody);
+        expect(response.statusCode).toEqual(400);
+    })
+
+    test("Chiamata all'API POST '/registrati' con password senza lettere maiuscole", async () => {
+        inputBody.Password = "password1!";
+        const response = await testSession.post("/registrati").send(inputBody);
+        expect(response.statusCode).toEqual(400);
+    })
+
+    test("Chiamata all'API POST '/registrati' con password senza lettere minuscole", async () => {
+        inputBody.Password = "PASSWORD1!";
+        const response = await testSession.post("/registrati").send(inputBody);
+        expect(response.statusCode).toEqual(400);
+    })
+
+    test("Chiamata all'API POST '/registrati' con password senza numeri", async () => {
+        inputBody.Password = "Password!!";
+        const response = await testSession.post("/registrati").send(inputBody);
+        expect(response.statusCode).toEqual(400);
+    })
+
     test("Chiamata all'API POST '/registrati' con utente non admin", async () => {
+        inputBody.Password = "Password1!";
         const response = await testSession.post("/registrati").send(inputBody);
         expect(response.statusCode).toEqual(303);
     })
 
     test("Chiamata all'API POST '/registrati' con utente già registrato", async () => {
         const response = await testSession.post("/registrati").send(inputBody);
-        expect(response.statusCode).toEqual(303);
+        expect(response.statusCode).toEqual(400);
     })
 
     // Vari test senza login
@@ -171,7 +202,7 @@ describe('Suite testing API utente_registrato', () => {
     // Test post-login
 
     test("Chiamata all'API POST '/login' con utente non admin", async () => {
-        inputBody.Password = "5423543"
+        inputBody.Password = "Password1!"
         const response = await testSession.post("/login").send(inputBody);
         expect(response.statusCode).toEqual(303);
     })
