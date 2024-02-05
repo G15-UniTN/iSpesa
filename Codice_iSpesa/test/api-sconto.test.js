@@ -1,4 +1,3 @@
-const request = require('supertest');
 const main = require("../main.js");
 const session = require('supertest-session');
 const port = process.env.PORT || 8080;
@@ -143,3 +142,5 @@ describe('Suite testing API sconto', () => {
         expect(response.statusCode).toEqual(204);
     })
 })
+
+
