@@ -96,18 +96,22 @@ app.use((req, res, next) => {
 
 app.get("/", (req, res) => {
     if(req.session.user != null){
+        res.status(200);
         res.render("home.hbs", { title: 'user', user: req.session.user, title: 'header', header: 'header_loggato'});
     }
     else{
+        res.status(200);
         res.render("home.hbs", { title: 'header', header: 'header'});
     }
 })
 
 app.get("/negozi", (req, res) => {
     if(req.session.user != null){
+        res.status(200);
         res.render("negozi.hbs", { title: 'user', user: req.session.user, title: 'header', header: 'header_loggato'});
     }
     else{
+        res.status(200);
         res.render("negozi.hbs", { title: 'header', header: 'header'});
     };
 })
@@ -119,9 +123,11 @@ app.get("/negozio", (req, res) => {
     }
     else{
         if(req.session.user != null){
+            res.status(200);
             res.render("negozio.hbs", { title: 'user', user: req.session.user, title: 'header', header: 'header_loggato', title: 'formRecensione', formRecensione:'formRecensione'});
         }
         else{
+            res.status(200);
             res.render("negozio.hbs", { title: 'header', header: 'header', title: 'formRecensione', formRecensione:'none'});
         };
     }
@@ -129,23 +135,28 @@ app.get("/negozio", (req, res) => {
 
 app.get("/sconti", (req, res) => {
     if(req.session.user != null){
+        res.status(200);
         res.render("sconti.hbs", { title: 'user', user: req.session.user, title: 'header', header: 'header_loggato'});
     }
     else{
+        res.status(200);
         res.render("sconti.hbs", { title: 'header', header: 'header'});
     };
 })
 
 app.get("/volantini", (req, res) => {
     if(req.session.user != null){
+        res.status(200);
         res.render("volantini.hbs", { title: 'user', user: req.session.user, title: 'header', header: 'header_loggato'});
     }
     else{
+        res.status(200);
         res.render("volantini.hbs", { title: 'header', header: 'header'});
     };
 })
 
 app.get("/login", (req, res) => {
+    res.status(200);
     res.render('login.hbs');
 })
 
@@ -158,6 +169,7 @@ app.get("/logout", (req, res) => {
 
 app.get("/preferiti", (req, res) => {
     if(req.session.user != null){
+        res.status(200);
         res.render("preferiti.hbs", { title: 'user', user: req.session.user, title: 'header', header: 'header_loggato'});
     }
     else{
@@ -168,9 +180,11 @@ app.get("/preferiti", (req, res) => {
 app.get("/area_personale", (req, res) => {
     if(req.session.user != null){
         if(req.session.isAdmin){
+            res.status(200);
             res.render("area_personale.hbs", { title: 'user', user: req.session.user, title: 'header', header: 'header_loggato', title: 'admin', admin: 'admin_settings'});
         }
         else{
+            res.status(200);
             res.render("area_personale.hbs", { title: 'user', user: req.session.user, title: 'header', header: 'header_loggato', title: 'admin', admin: 'none'});
         }
     }
@@ -181,6 +195,7 @@ app.get("/area_personale", (req, res) => {
 
 app.get("/admin_utenti", (req, res) => {
     if(req.session.isAdmin){
+        res.status(200);
         res.render("admin_utenti.hbs", { title: 'header', header: 'header_loggato'});
     }
     else{
@@ -190,6 +205,7 @@ app.get("/admin_utenti", (req, res) => {
 
 app.get("/admin_recensioni", (req, res) => {
     if(req.session.isAdmin){
+        res.status(200);
         res.render("admin_recensioni.hbs", { title: 'header', header: 'header_loggato'});
     }
     else{
@@ -198,10 +214,12 @@ app.get("/admin_recensioni", (req, res) => {
 })
 
 app.get("/signup", (req, res) => {
+    res.status(200);
     res.render('signup.hbs');
 })
 
 app.get("/password_dimenticata", (req, res) => {
+    res.status(200);
     res.render('password_dimenticata.hbs');
 })
 
@@ -211,9 +229,11 @@ app.get("/prodotto", (req, res) => {
     }
     else{
         if(req.session.user != null){
+            res.status(200);
             res.render("prodotto.hbs", { title: 'user', user: req.session.user, title: 'header', header: 'header_loggato'});
         }
         else{
+            res.status(200);
             res.render("prodotto.hbs", { title: 'header', header: 'header'});
         };
     }
