@@ -72,7 +72,7 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-dark-subtle">
         <div class="container-fluid">
             <div class="d-flex">
-                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                <input class="form-control me-2" type="search" id="negozioCercato" onchange="cercaNegozio()" placeholder="Search" aria-label="Search">
                 </div>
             </div>
         </div>
@@ -131,6 +131,61 @@
             document.getElementById("listaNegozi").appendChild(c1);
           }
         })
+      }
+
+      function cercaNegozio(){
+        var negozioCercato = document.getElementById("negozioCercato").value;
+        if(negozioCercato == " " || negozioCercato == ""){
+          caricaNegozi();
+        }
+        else{
+          document.getElementById("listaNegozi").innerHTML = "";
+          fetch(url_sito + "/api/trovaTuttiNegozi")
+          .then(response => response.json())
+          .then(data => {
+            var i = 0;
+            var k = 0;
+            while(k < 18 && i < data.length){
+              var Ubicazione = data[i].Ubicazione;
+              var Orari = data[i].Orari;
+              var Nome = data[i].Nome;
+              var Logo = data[i].Logo;
+              var IDNegozio = data[i].IDNegozio;
+              if(Nome.toLowerCase().includes(negozioCercato.toLowerCase())){
+                let c1 = document.createElement("div");
+                c1.classList.add("col-2", "p-3");
+                var funzione_pagina_negozio = "paginaNegozio('" + IDNegozio + "')";
+                c1.setAttribute("onclick", funzione_pagina_negozio);
+                c1.style.cursor = "pointer";
+                let c2 = document.createElement("div");
+                c2.classList.add("card", "bg-secondary-subtle", "shadow");
+                let c3 = document.createElement("div");
+                c3.classList.add("container", "p-3");
+                let c4 = document.createElement("img");
+                c4.classList.add("card-img-top", "p-3");
+                c4.src = Logo;
+                let c5 = document.createElement("div");
+                c5.classList.add("card-body");
+                let c6 = document.createElement("h5");
+                c6.classList.add("card-title");
+                c6.innerHTML = Nome;
+                let c8 = document.createElement("h3");
+                c8.classList.add("font-prezzo_nuovo", "mb-1");
+                c8.innerHTML = Orari;
+                i++;
+                c1.appendChild(c2);
+                c2.appendChild(c3);
+                c3.appendChild(c4);
+                c2.appendChild(c5);
+                c5.appendChild(c6);
+                c5.appendChild(c8);
+                document.getElementById("listaNegozi").appendChild(c1);
+                k++;
+              }
+              i++;
+            }
+          })
+        }
       }
 
       function paginaNegozio(IDNegozio){

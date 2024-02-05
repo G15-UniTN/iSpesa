@@ -222,9 +222,19 @@
                 <div class="container p-2">
                     <div class="row">
                         <div class="col-12 d-flex justify-content-center align-items-center">
-                            <h1 id="Nome"></h1>
+                            <div>
+                                <div>
+                                    <h1 id="Nome" style="text-align:center"></h1>
+                                </div>
+                                <div>
+                                    <h3 id="Orario" style="text-align:center"></h3>
+                                </div>
+                                <div>
+                                    <h3 id="Ubicazione" style="text-align:center"></h3>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col" style="position:absolute; cursor: pointer" id="Stella_container" onclick="aggiungiPreferiti()">
+                        <div class="col-1" style="position:absolute; cursor: pointer; max-width:100%" id="Stella_container" onclick="aggiungiPreferiti()">
                             <img style="width:80px" id="Stella" hidden src="/img/sito/stella.webp" id="Logo">
                         </div>
                     </div>
@@ -263,10 +273,13 @@
             .then(response => response.json())
             .then(data => {
                 var Nome = data[0].Nome;
+                var Orari = data[0].Orari;
+                var Ubicazione = data[0].Ubicazione;
                 var Logo = data[0].Logo;
                 var IDNegozio = data[0].IDNegozio;
-                var Prezzo = data[0].Prezzo;
                 document.getElementById("Nome").innerHTML = Nome.replaceAll("_", " ");
+                document.getElementById("Orario").innerHTML = "Orario: " + Orari;
+                document.getElementById("Ubicazione").innerHTML = "Ubicazione: " + Ubicazione.replaceAll("_", " ");
                 document.getElementById("Logo").src = Logo;
                 caricaDatiUtente();
             })

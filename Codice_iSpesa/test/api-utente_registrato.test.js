@@ -98,6 +98,11 @@ describe('Suite testing API utente_registrato', () => {
         expect(response.statusCode).toEqual(403);
     })
 
+    test("Chiamata all'API PATCH '/api/inviaMail' senza login", async () => {
+        const response = await testSession.get("/api/inviaMail");
+        expect(response.statusCode).toEqual(200);
+    })
+
     test("Chiamata all'API PATCH '/api/modificaEmail' senza login", async () => {
         const inputBody = {
             Username: Username,
