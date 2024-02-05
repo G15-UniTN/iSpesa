@@ -11,7 +11,49 @@ const swaggerOptions ={
         info : {
             title: 'iSpesa API',
             version: '1.0.0',
-        }
+            description: "Documentazione delle API per iSpesa",
+            license: {
+                "name": "MIT",
+                "url": "https://opensource.org/licenses/MIT"
+            }
+        },
+        schemes: ["http", "https"],
+        consumes: ["application/json"],
+        produces: ["application/json"],
+        tags: [
+            {
+                name: "Utente",
+                description: "API per il modello 'Utente'. Tutte le API per gestire le azioni relative agli Utenti."
+            },
+            {
+                name: "Volantino",
+                description: "API per il modello 'Volantino'. Tutte le API per gestire le azioni relative ai Volantini."
+            },
+            {
+                name: "Sconto",
+                description: "API per il modello 'Sconto'. Tutte le API per gestire le azioni relative agli Sconti."
+            },
+            {
+                name: "Negozio",
+                description: "API per il modello 'Negozio'. Tutte le API per gestire le azioni relative ai Negozi."
+            },
+            {
+                name: "Prodotto",
+                description: "API per il modello 'Prodotto'. Tutte le API per gestire le azioni relative ai Prodotti."
+            },
+            {
+                name: "Recensione",
+                description: "API per il modello 'Recensione'. Tutte le API per gestire le azioni relative alle Recensioni."
+            },
+            {
+                name: "GMail",
+                description: "API per inviare Email agli Utenti. Non implementato. (Presente come placeholder)"
+            },
+            {
+                name: "Categoria",
+                description: "API per il modello 'Recensione'. Tutte le API per gestire le azioni relative alle Categorie."
+            },
+        ],
     },
     apis: ['main.js'],
 };
@@ -182,7 +224,7 @@ app.get("/prodotto", (req, res) => {
  * /login:
  *  post:
  *      description: Utilizzata per effettuare il login.
- *      tags: ["Utenti"]
+ *      tags: ["Utente"]
  *      parameters:
  *       - in: query
  *         name: Username
@@ -193,10 +235,8 @@ app.get("/prodotto", (req, res) => {
  *         type: string
  *         description: Password dell'Utente da loggare.
  *      responses:
- *          204:
- *              description: NO CONTENT. Login effettuato con successo.
- *          400:
- *              description: BAD REQUEST. Username o password dell'utente non corrette.
+ *          303:
+ *              description: SEE OTHER. Reindirizza l'utente ad un'altra pagina.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -236,7 +276,7 @@ app.post("/login", (req, res) => {
  * /registrati:
  *  post:
  *      description: Usata per inserire nuovi Utenti nel sistema.
- *      tags: ["Utenti"]
+ *      tags: ["Utente"]
  *      parameters:
  *       - in: body
  *         name: Dati Utente
@@ -261,13 +301,11 @@ app.post("/login", (req, res) => {
  *                  description: Numero di Telefono dell'Utente da registrare.
  *                  example: 3334455589
  *      responses:
- *          200:
- *              description: OK. Utente registrato correttamente.
+ *          303:
+ *              description: SEE OTHER. Reindirizza l'utente ad un'altra pagina.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
-
-//metti tu altre risposte pls
 app.post("/registrati", (req, res) => {
     var Username = req.body.Username;
     var Password = req.body.Password;
@@ -353,7 +391,7 @@ app.post("/registrati", (req, res) => {
  * /api/salvaVolantino:
  *  post:
  *      description: Aggiungi un nuovo Volantino al sistema.
- *      tags: ["Volantini"]
+ *      tags: ["Volantino"]
  *      parameters:
  *       - in: body
  *         name: Dati Volantino
@@ -377,8 +415,10 @@ app.post("/registrati", (req, res) => {
  *      responses:
  *          201:
  *              description: Created. Volantino creato correttamente e salvato.
- *          409:
- *              description: CONFLICT. Errore in seguito all'inserimento di un IDVolantino già presente.
+ *          400:
+ *              description: BAD REQUEST. Dati del Volantino non validi.
+ *          403:
+ *              description: FORBIDDEN. L'Utente che sta provando ad effettuare l'inserimento non è un Amministratore.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -415,7 +455,7 @@ app.post("/api/salvaVolantino", (req, res) => {
  * /api/eliminaVolantino:
  *  delete:
  *      description: Elimina un Volantino dal sistema.
- *      tags: ["Volantini"]
+ *      tags: ["Volantino"]
  *      parameters:
  *       - in: query
  *         name: IDVolantino
@@ -424,8 +464,10 @@ app.post("/api/salvaVolantino", (req, res) => {
  *      responses:
  *          204:
  *              description: NO CONTENT. Volantino eliminato correttamente e nessun ritorno dall'API.
- *          404:
- *              description: NOT FOUND. Nessun Volantino con tale ID presente nel sistema.
+ *          400:
+ *              description: BAD REQUEST. ID del Volantino non valido. 
+ *          403:
+ *              description: FORBIDDEN. L'Utente che sta provando ad effettuare l'inserimento non è un Amministratore.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -459,12 +501,10 @@ app.delete("/api/eliminaVolantino", (req, res) => {
  * /api/trovaTuttiVolantini:
  *  get:
  *      description: Ottiene tutti i Volantini salvati nel sistema.
- *      tags: ["Volantini"]
+ *      tags: ["Volantino"]
  *      responses:
  *          200:
  *              description: OK. Si ottengono correttamente tutti i Volantini.
- *          404:
- *              description: NOT FOUND. Nessun Volantino presente nel sistema.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -487,7 +527,7 @@ app.get("/api/trovaTuttiVolantini", (req, res) => {
  * /api/trovaVolantiniFiltroNegozio:
  *  get:
  *      description: Ottiene tutti i volantini salvati nel sistema che si riferiscono ad un determinato negozio.
- *      tags: ["Volantini"]
+ *      tags: ["Volantino"]
  *      parameters:
  *       - in: query
  *         name: IDNegozio
@@ -522,7 +562,7 @@ app.get("/api/trovaVolantiniFiltroNegozio", (req, res) => {
  * /api/salvaSconto:
  *  post:
  *      description: Aggungi un nuovo Sconto al sistema.
- *      tags: ["Sconti"]
+ *      tags: ["Sconto"]
  *      parameters:
  *       - in: body
  *         name: Dati Sconto
@@ -592,7 +632,7 @@ app.post("/api/salvaSconto", (req, res) => {
  * /api/eliminaSconto:
  *  delete:
  *      description: Elimina uno Sconto dal sistema.
- *      tags: ["Sconti"]
+ *      tags: ["Sconto"]
  *      parameters:
  *       - in: query
  *         name: IDSconto
@@ -601,6 +641,8 @@ app.post("/api/salvaSconto", (req, res) => {
  *      responses:
  *          204:
  *              description: NO CONTENT. Sconto eliminato correttamente e nessun ritorno dall'API.
+ *          400:
+ *              description: BAD REQUEST. ID dello Sconto non valido.
  *          403:
  *              description: FORBIDDEN. Errore nel caso in cui un Utente non Amministratore provi a salvare uno Sconto.
  *          500:
@@ -630,6 +672,32 @@ app.delete("/api/eliminaSconto", (req, res) => {
     }
 })
 
+/**
+ * @swagger
+ * /api/associaScontoProdotto:
+ *  post:
+ *      description: Associa ad uno Sconto un Prodotto.
+ *      tags: ["Sconto"]
+ *      parameters:
+ *       - in: query
+ *         name: IDSconto
+ *         type: integer
+ *         description: ID dello Sconto desiderato.
+ *       - in: query
+ *         name: IDProdotto
+ *         type: integer
+ *         description: ID del Prodotto da associare.
+
+ *      responses:
+ *          204:
+ *              description: NO CONTENT. Associazione creata con successo e nessun ritorno dall'API.
+ *          400:
+ *              description: BAD REQUEST. ID dello Sconto o del Prodotto non valido.
+ *          403:
+ *              description: FORBIDDEN. L'Utente che prova ad eseguire l'azione non è un Amministratore.
+ *          500:
+ *              description: SERVER ERROR. Di varia natura.
+ */ 
 app.post("/api/associaScontoProdotto", (req, res) => {
     var IDProdotto = req.body.IDProdotto;
     var IDSconto = req.body.IDSconto;
@@ -656,6 +724,32 @@ app.post("/api/associaScontoProdotto", (req, res) => {
     }
 })
 
+/**
+ * @swagger
+ * /api/associaScontoCategoria:
+ *  post:
+ *      description: Associa ad uno Sconto una Categoria.
+ *      tags: ["Sconto"]
+ *      parameters:
+ *       - in: query
+ *         name: IDSconto
+ *         type: integer
+ *         description: ID dello Sconto desiderato.
+ *       - in: query
+ *         name: Categoria
+ *         type: string
+ *         description: Categoria da associare.
+
+ *      responses:
+ *          204:
+ *              description: NO CONTENT. Associazione creata con successo e nessun ritorno dall'API.
+ *          400:
+ *              description: BAD REQUEST. ID dello Sconto o Categoria non valida.
+ *          403:
+ *              description: FORBIDDEN. L'Utente che prova ad eseguire l'azione non è un Amministratore.
+ *          500:
+ *              description: SERVER ERROR. Di varia natura.
+ */ 
 app.post("/api/associaScontoCategoria", (req, res) => {
     var Categoria = req.body.Categoria;
     var IDSconto = req.body.IDSconto;
@@ -687,7 +781,7 @@ app.post("/api/associaScontoCategoria", (req, res) => {
  * /api/trovaTuttiSconti:
  *  get:
  *      description: Ottiene tutti gli Sconti salvati nel sistema.
- *      tags: ["Sconti"]
+ *      tags: ["Sconto"]
  *      responses:
  *          200:
  *              description: OK. Si ottengono correttamente tutti gli Sconti.
@@ -714,7 +808,7 @@ app.get("/api/trovaTuttiSconti", (req, res) => {
  * /api/trovaScontiConCategoria:
  *  get:
  *      description: Ottiene tutti gli Sconti salvati nel sistema e la relativa categoria di riferimento.
- *      tags: ["Sconti"]
+ *      tags: ["Sconto"]
  *      responses:
  *          200:
  *              description: OK. Si ottengono correttamente tutti gli Sconti e la categoria associata.
@@ -741,7 +835,7 @@ app.get("/api/trovaScontiConCategoria", (req, res) => {
  * /api/trovaScontiConCategoriaFiltroNegozio:
  *  get:
  *      description: Ottiene tutti gli Sconti salvati nel sistema che si riferiscono ad un determinato Negozio e la loro relativa categoria.
- *      tags: ["Sconti"]
+ *      tags: ["Sconto"]
  *      parameters:
  *       - in: query
  *         name: IDNegozio
@@ -774,7 +868,7 @@ app.get("/api/trovaScontiConCategoriaFiltroNegozio", (req, res) => {
  * /api/trovaScontiConProdotto:
  *  get:
  *      description: Ottiene tutti gli Sconti salvati nel sistema e i prodotti su cui valgono.
- *      tags: ["Sconti"]
+ *      tags: ["Sconto"]
  *      responses:
  *          200:
  *              description: OK. Si ottengono correttamente tutti gli Sconti e  i prodotti associati.
@@ -801,7 +895,7 @@ app.get("/api/trovaScontiConProdotto", (req, res) => {
  * /api/trovaScontiConProdottoFiltroNegozio:
  *  get:
  *      description: Ottiene tutti gli Sconti salvati nel sistema che si riferiscono ad un determinato Negozio e i prodotti su cui sono validi.
- *      tags: ["Sconti"]
+ *      tags: ["Sconto"]
  *      parameters:
  *       - in: query
  *         name: IDNegozio
@@ -836,7 +930,7 @@ app.get("/api/trovaScontiConProdottoFiltroNegozio", (req, res) => {
  * /api/salvaNegozio:
  *  post:
  *      description: Aggungi un nuovo Negozio al sistema.
- *      tags: ["Negozi"]
+ *      tags: ["Negozio"]
  *      parameters:
  *       - in: body
  *         name: Dati Negozio
@@ -862,7 +956,7 @@ app.get("/api/trovaScontiConProdottoFiltroNegozio", (req, res) => {
  *                  example: 08:00 - 20:00
  *      responses:
  *          201:
- *              description: CREATED. Sconto creato correttamente e salvato.
+ *              description: CREATED. Negozio creato correttamente e salvato.
  *          400:
  *              description: BAD REQUEST. Errore inviato nel caso in cui i dati del Negozio siano non validi.
  *          403:
@@ -903,7 +997,7 @@ app.post("/api/salvaNegozio", (req, res) => {
  * /api/eliminaNegozio:
  *  delete:
  *      description: Elimina un Negozio dal sistema.
- *      tags: ["Negozi"]
+ *      tags: ["Negozio"]
  *      parameters:
  *       - in: query
  *         name: IDNegozio
@@ -948,7 +1042,7 @@ app.delete("/api/eliminaNegozio", (req, res) => {
  * /api/modificaOrari:
  *  patch:
  *      description: Modifica l'orario di un Negozio.
- *      tags: ["Negozi"]
+ *      tags: ["Negozio"]
  *      parameters:
  *       - in: query
  *         name: IDNegozio
@@ -998,7 +1092,7 @@ app.patch("/api/modificaOrari", (req, res) => {
  * /api/modificaUbicazione:
  *  patch:
  *      description: Modifica l'ubicazione di un Negozio.
- *      tags: ["Negozi"]
+ *      tags: ["Negozio"]
  *      parameters:
  *       - in: query
  *         name: IDNegozio
@@ -1048,7 +1142,7 @@ app.patch("/api/modificaUbicazione", (req, res) => {
  * /api/trovaTuttiNegozi:
  *  get:
  *      description: Ottiene tutti i Negozi salvati nel sistema.
- *      tags: ["Negozi"]
+ *      tags: ["Negozio"]
  *      responses:
  *          200:
  *              description: OK. Si ottengono correttamente tutti i Negozi.
@@ -1075,7 +1169,7 @@ app.get("/api/trovaTuttiNegozi", (req, res) => {
  * /api/trovaTuttiNegoziFiltroNome:
  *  get:
  *      description: Ottiene tutti i Negozi salvati nel sistema con un determinato nome.
- *      tags: ["Negozi"]
+ *      tags: ["Negozio"]
  *      parameters:
  *       - in: query
  *         name: NomeNegozio
@@ -1108,7 +1202,7 @@ app.get("/api/trovaTuttiNegoziFiltroNome", (req, res) => {
  * /api/trovaTuttiNegoziFiltroUbicazione:
  *  get:
  *      description: Ottiene tutti i Negozi salvati nel sistema che si trovano in un determinato luogo.
- *      tags: ["Negozi"]
+ *      tags: ["Negozio"]
  *      parameters:
  *       - in: query
  *         name: UbicazioneNegozio
@@ -1141,7 +1235,7 @@ app.get("/api/trovaTuttiNegoziFiltroUbicazione", (req, res) => {
  * /api/trovaNegozioFiltroID:
  *  get:
  *      description: Ottiene il Negozio salvato nel sistema con l'ID desiderato.
- *      tags: ["Negozi"]
+ *      tags: ["Negozio"]
  *      parameters:
  *       - in: query
  *         name: IDNegozio
@@ -1176,7 +1270,7 @@ app.get("/api/trovaNegozioFiltroID", (req, res) => {
  * /api/salvaProdotto:
  *  post:
  *      description: Aggungi un nuovo Prodotto al sistema.
- *      tags: ["Prodotti"]
+ *      tags: ["Prodotto"]
  *      parameters:
  *       - in: body
  *         name: Dati del Prodotto
@@ -1244,7 +1338,7 @@ app.post("/api/salvaProdotto", (req, res) => {
  * /api/eliminaProdotto:
  *  delete:
  *      description: Elimina un Prodotto dal sistema.
- *      tags: ["Prodotti"]
+ *      tags: ["Prodotto"]
  *      parameters:
  *       - in: query
  *         name: IDProdotto
@@ -1281,7 +1375,7 @@ app.delete("/api/eliminaProdotto", (req, res) => {
  * /api/modificaImmagine:
  *  patch:
  *      description: Modifica l'immagine di un Prodotto.
- *      tags: ["Prodotti"]
+ *      tags: ["Prodotto"]
  *      parameters:
  *       - in: query
  *         name: IDProdotto
@@ -1324,7 +1418,7 @@ app.patch("/api/modificaImmagine", (req, res) => {
  * /api/aggiungiPrezzo:
  *  post:
  *      description: Aggiungi un prezzo allo storico prezzi di un prodotto.
- *      tags: ["Prodotti"]
+ *      tags: ["Prodotto"]
  *      parameters:
  *       - in: query
  *         name: IDProdotto
@@ -1368,7 +1462,7 @@ app.post("/api/aggiungiPrezzo", (req, res) => {
  * /api/trovaTuttiProdotti:
  *  get:
  *      description: Ottiene tutti i Prodotti salvati nel sistema.
- *      tags: ["Prodotti"]
+ *      tags: ["Prodotto"]
  *      responses:
  *          200:
  *              description: OK. Si ottengono correttamente tutti i Prodotti.
@@ -1395,7 +1489,7 @@ app.get("/api/trovaTuttiProdotti", (req, res) => {
  * /api/trovaTuttiProdottiScontati:
  *  get:
  *      description: Ottiene tutti i Prodotti salvati nel sistema su cui vi è uno sconto.
- *      tags: ["Prodotti"]
+ *      tags: ["Prodotto"]
  *      responses:
  *          200:
  *              description: OK. Si ottengono correttamente tutti i Prodotti con uno sconto valido associato.
@@ -1422,7 +1516,7 @@ app.get("/api/trovaTuttiProdottiScontati", (req, res) => {
  * /api/trovaTuttiProdottiScontatiFiltroCategoria:
  *  get:
  *      description: Ottiene tutti i Prodotti salvati nel sistema su cui vi è uno sconto e con una categoria specifica.
- *      tags: ["Prodotti"]
+ *      tags: ["Prodotto"]
  *      parameters:
  *       - in: query
  *         name: Categoria
@@ -1455,7 +1549,7 @@ app.get("/api/trovaTuttiProdottiScontatiFiltroCategoria", (req, res) => {
  * /api/trovaProdottiFiltroNome:
  *  get:
  *      description: Ottiene tutti i Prodotti salvati nel sistema con un nome specifico.
- *      tags: ["Prodotti"]
+ *      tags: ["Prodotto"]
  *      parameters:
  *       - in: query
  *         name: NomeProdotto
@@ -1488,7 +1582,7 @@ app.get("/api/trovaProdottiFiltroNome", (req, res) => {
  * /api/trovaProdottoFiltroID:
  *  get:
  *      description: Ottiene un Prodotto salvato nel sistema con un ID specifico.
- *      tags: ["Prodotti"]
+ *      tags: ["Prodotto"]
  *      parameters:
  *       - in: query
  *         name: IDProdotto
@@ -1521,7 +1615,7 @@ app.get("/api/trovaProdottoFiltroID", (req, res) => {
  * /api/trovaProdottiFiltroNegozio:
  *  get:
  *      description: Ottiene tutti i Prodotti salvati nel sistema presenti in un determinato Negozio.
- *      tags: ["Prodotti"]
+ *      tags: ["Prodotto"]
  *      parameters:
  *       - in: query
  *         name: IDNegozio
@@ -1554,7 +1648,7 @@ app.get("/api/trovaProdottiFiltroNegozio", (req, res) => {
  * /api/trovaProdottiFiltroCategoria:
  *  get:
  *      description: Ottiene tutti i Prodotti salvati nel sistema appartenenti ad una Determinata Categoria.
- *      tags: ["Prodotti"]
+ *      tags: ["Prodotto"]
  *      parameters:
  *       - in: query
  *         name: Categoria
@@ -1589,7 +1683,7 @@ app.get("/api/trovaProdottiFiltroCategoria", (req, res) => {
  * /api/eliminaUtente:
  *  delete:
  *      description: Elimina un Prodotto dal sistema.
- *      tags: ["Utenti"]
+ *      tags: ["Utente"]
  *      parameters:
  *       - in: query
  *         name: Username
@@ -1599,7 +1693,7 @@ app.get("/api/trovaProdottiFiltroCategoria", (req, res) => {
  *          204:
  *              description: NO CONTENT. Utente eliminato correttamente e nessun ritorno dall'API.
  *          303:
- *              description: mettere.
+ *              description: SEE OTHER. Reindirizza l'utente ad un'altra pagina.
  *          403:
  *              description: FORBIDDEN. Errore inviato nel caso in cui l'Utente non venga eliminato da se stesso o da un Amministratore.
  *          500:
@@ -1637,7 +1731,7 @@ app.delete("/api/eliminaUtente", (req, res) => {
  * /api/ripristinoPassword:
  *  get:
  *      description: Ripristina la password di un utente. Si tratta di un placeholder non implementato poiché richiede Auth0
- *      tags: ["Utenti"]
+ *      tags: ["Utente"]
  */
 app.get("/api/ripristinoPassword", (req, res) => {
     //Usa GMail e Auth0
@@ -1649,7 +1743,7 @@ app.get("/api/ripristinoPassword", (req, res) => {
  * /api/attiva2AF:
  *  patch:
  *      description: Attiva la 2AF di un Utente. Si tratta di un placeholder non implementato completamente poiché richiede Auth0
- *      tags: ["Utenti"]
+ *      tags: ["Utente"]
  *      parameters:
  *       - in: query
  *         name: Username
@@ -1660,8 +1754,10 @@ app.get("/api/ripristinoPassword", (req, res) => {
  *         type: string
  *         description: Email dell'Utente desiderato.
  *      responses:
- *          303:
- *              description: NO CONTENT. Attivazione avvenuta correttamente e nessun ritorno dall'API.
+ *          204:
+ *              description: NO CONTENT. Attivazione avvenuta con successo e nessun ritorno dall'API.
+ *          403:
+ *              description: FORBIDDEN. Azione eseguita da un Utente diverso dall'Utente target o da un non Amministratore.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -1693,7 +1789,7 @@ app.patch("/api/attiva2AF", (req, res) => {
  * /api/modificaPassword:
  *  patch:
  *      description: Modifica la password di un Utente. Non è stata implementata completamente poiché richiede Auth0.
- *      tags: ["Utenti"]
+ *      tags: ["Utente"]
  *      parameters:
  *       - in: query
  *         name: Username
@@ -1711,11 +1807,11 @@ app.patch("/api/attiva2AF", (req, res) => {
  *          204:
  *              description: NO CONTENT. Modifica avvenuta correttamente e nessun ritorno dall'API.
  *          303:
- *              description: NO CONTENT. Modifica avvenuta correttamente e nessun ritorno dall'API.
+ *              description: SEE OTHER. Reindirizza l'utente ad un'altra pagina.
  *          400:
- *              description: BAD REQUEST. Capire.
+ *              description: BAD REQUEST. Richiesta non valida.
  *          403:
- *              description: FORBIDDEN. Errore inviato nel caso in cui la password sia errata.
+ *              description: FORBIDDEN. Azione eseguita da un Utente diverso dall'Utente target o da un non Amministratore.
  *          500:
  *              description: SERVER ERROR. Di varia natura.
  */
@@ -1768,7 +1864,7 @@ app.patch("/api/modificaPassword", (req, res) => {
  * /api/modificaEmail:
  *  patch:
  *      description: Modifica la mail di un Utente.
- *      tags: ["Utenti"]
+ *      tags: ["Utente"]
  *      parameters:
  *       - in: query
  *         name: Username
@@ -1782,7 +1878,7 @@ app.patch("/api/modificaPassword", (req, res) => {
  *          204:
  *              description: NO CONTENT. Modifica avvenuta correttamente e nessun ritorno dall'API.
  *          303:
- *              description: NOT FOUND. Nessun Utente con tale username presente nel sistema.
+ *              description: SEE OTHER. Utente rediretto ad un'altra pagina.
  *          403:
  *              description: FORBIDDEN. Errore inviato nel caso in cui l'Email dell'Utente non venga modificata da se stesso o da un Amministratore.
  *          500:
@@ -1821,7 +1917,7 @@ app.patch("/api/modificaEmail", (req, res) => {
  * /api/modificaNumeroTelefono:
  *  patch:
  *      description: Modifica il numero di telefono di un Utente.
- *      tags: ["Utenti"]
+ *      tags: ["Utente"]
  *      parameters:
  *       - in: query
  *         name: Username
@@ -1835,7 +1931,7 @@ app.patch("/api/modificaEmail", (req, res) => {
  *          204:
  *              description: NO CONTENT. Modifica avvenuta correttamente e nessun ritorno dall'API.
  *          303:
- *              description: NOT FOUND. Nessun Utente con tale username presente nel sistema.
+ *              description: SEE OTHER. Utente rediretto ad un'altra pagina.
  *          403:
  *              description: FORBIDDEN. Errore inviato nel caso in cui il numero di telefono dell'Utente non venga modificata da se stesso o da un Amministratore.
  *          500:
@@ -1874,7 +1970,7 @@ app.patch("/api/modificaNumeroTelefono", (req, res) => {
  * /api/modificaFotoProfilo:
  *  patch:
  *      description: Modifica la foto profilo di un Utente.
- *      tags: ["Utenti"]
+ *      tags: ["Utente"]
  *      parameters:
  *       - in: query
  *         name: Username
@@ -1888,7 +1984,7 @@ app.patch("/api/modificaNumeroTelefono", (req, res) => {
  *          204:
  *              description: NO CONTENT. Modifica avvenuta correttamente e nessun ritorno dall'API.
  *          303:
- *              description: NOT FOUND. Nessun Utente con tale username presente nel sistema.
+ *              description: SEE OTHER. Utente rediretto ad un'altra pagina.
  *          403:
  *              description: FORBIDDEN. Errore inviato nel caso in cui la foto profilo dell'Utente non venga modificata da se stesso o da un Amministratore.
  *          500:
@@ -1926,7 +2022,7 @@ app.patch("/api/modificaFotoProfilo", (req, res) => {
  * /api/aggiungiProdottoAiPreferiti:
  *  post:
  *      description: Aggiunge un Prodotto alla Lista Preferiti di un Utente.
- *      tags: ["Utenti"]
+ *      tags: ["Utente"]
  *      parameters:
  *       - in: query
  *         name: Username
@@ -1940,7 +2036,7 @@ app.patch("/api/modificaFotoProfilo", (req, res) => {
  *          204:
  *              description: NO CONTENT. Aggiunta avvenuta correttamente e nessun ritorno dall'API.
  *          400:
- *              description: NOT FOUND. Errore inviato nel caso in cui l'ID del Prodotto da aggiungere non sia valido.
+ *              description: BAD REQUEST. Errore inviato nel caso in cui l'ID del Prodotto da aggiungere non sia valido.
  *          403:
  *              description: FORBIDDEN. Errore inviato nel caso in cui un Utente non loggato (con username null) provi a inserire un prodotto come preferito.
  *          500:
@@ -1975,7 +2071,7 @@ app.post("/api/aggiungiProdottoAiPreferiti", (req, res) => {
  * /api/rimuoviProdottoDaiPreferiti:
  *  delete:
  *      description: Rimuove un Prodotto dalla Lista Preferiti di un Utente.
- *      tags: ["Utenti"]
+ *      tags: ["Utente"]
  *      parameters:
  *       - in: query
  *         name: Username
@@ -1989,7 +2085,7 @@ app.post("/api/aggiungiProdottoAiPreferiti", (req, res) => {
  *          204:
  *              description: NO CONTENT. Rimozione avvenuta correttamente e nessun ritorno dall'API.
  *          400:
- *              description: NOT FOUND. Errore inviato nel caso in cui l'ID del Prodotto da rimuovere non sia valido.
+ *              description: BAD REQUEST. Errore inviato nel caso in cui l'ID del Prodotto da rimuovere non sia valido.
  *          403:
  *              description: FORBIDDEN. Errore inviato nel caso in cui un Utente non loggato (con username null) provi a rimuovere un prodotto dai preferiti.
  *          500:
@@ -2024,7 +2120,7 @@ app.delete("/api/rimuoviProdottoDaiPreferiti", (req, res) => {
  * /api/aggiungiNegozioAiPreferiti:
  *  post:
  *      description: Aggiunge un Negozio alla Lista Preferiti di un Utente.
- *      tags: ["Utenti"]
+ *      tags: ["Utente"]
  *      parameters:
  *       - in: query
  *         name: Username
@@ -2038,7 +2134,7 @@ app.delete("/api/rimuoviProdottoDaiPreferiti", (req, res) => {
  *          204:
  *              description: NO CONTENT. Aggiunta avvenuta correttamente e nessun ritorno dall'API.
  *          400:
- *              description: NOT FOUND. Errore inviato nel caso in cui l'ID del Negozio da aggiungere non sia valido.
+ *              description: BAD REQUEST. Errore inviato nel caso in cui l'ID del Negozio da aggiungere non sia valido.
  *          403:
  *              description: FORBIDDEN. Errore inviato nel caso in cui un Utente non loggato (con username null) provi a inserire un Negozio come preferito.
  *          500:
@@ -2073,7 +2169,7 @@ app.post("/api/aggiungiNegozioAiPreferiti", (req, res) => {
  * /api/rimuoviNegozioDaiPreferiti:
  *  delete:
  *      description: Rimuove un Negozio dalla Lista Preferiti di un Utente.
- *      tags: ["Utenti"]
+ *      tags: ["Utente"]
  *      parameters:
  *       - in: query
  *         name: Username
@@ -2087,7 +2183,7 @@ app.post("/api/aggiungiNegozioAiPreferiti", (req, res) => {
  *          204:
  *              description: NO CONTENT. Aggiunta avvenuta correttamente e nessun ritorno dall'API.
  *          400:
- *              description: NOT FOUND. Errore inviato nel caso in cui l'ID del Negozio da rimuovere non sia valido.
+ *              description: BAD REQUEST. Errore inviato nel caso in cui l'ID del Negozio da rimuovere non sia valido.
  *          403:
  *              description: FORBIDDEN. Errore inviato nel caso in cui un Utente non loggato (con username null) provi a rimuovere un Negozio dai preferiti.
  *          500:
@@ -2122,7 +2218,7 @@ app.delete("/api/rimuoviNegozioDaiPreferiti", (req, res) => {
  * /api/ottieniDatiUtente:
  *  get:
  *      description: Ottiene i dati di un Utente.
- *      tags: ["Utenti"]
+ *      tags: ["Utente"]
  *      parameters:
  *       - in: query
  *         name: Username
@@ -2164,10 +2260,8 @@ app.get("/api/ottieniDatiUtente", (req, res) => {
  * /api/trovaTuttiUtenti:
  *  get:
  *      description: Ottiene tutti gli Utenti salvati nel sistema.
- *      tags: ["Utenti"]
+ *      tags: ["Utente"]
  *      responses:
- *          200:
- *              description: OK. Si ottengono correttamente tutti gli Utenti.
  *          403:
  *              description: FORBIDDEN. Errore inviato nel caso in cui chi chiede i dati non è un Amministratore.
  *          500:
@@ -2199,7 +2293,7 @@ app.get("/api/trovaTuttiUtenti", (req, res) => {
  * /api/ottieniProdottiPreferiti:
  *  get:
  *      description: Ottiene i Prodotti preferiti di un Utente.
- *      tags: ["Utenti"]
+ *      tags: ["Utente"]
  *      parameters:
  *       - in: query
  *         name: Username
@@ -2240,7 +2334,7 @@ app.get("/api/ottieniProdottiPreferiti", (req, res) => {
  * /api/checkProdottoPreferito:
  *  get:
  *      description: Controlla se un Prodotto è nei preferiti di un Utente.
- *      tags: ["Utenti"]
+ *      tags: ["Utente"]
  *      parameters:
  *       - in: query
  *         name: Username
@@ -2286,7 +2380,7 @@ app.get("/api/checkProdottoPreferito", (req, res) => {
  * /api/ottieniNegoziPreferiti:
  *  get:
  *      description: Ottiene i Negozi preferiti di un Utente.
- *      tags: ["Utenti"]
+ *      tags: ["Utente"]
  *      parameters:
  *       - in: query
  *         name: Username
@@ -2327,7 +2421,7 @@ app.get("/api/ottieniNegoziPreferiti", (req, res) => {
  * /api/checkNegozioPreferito:
  *  get:
  *      description: Controlla se un Negozio è nei preferiti di un Utente.
- *      tags: ["Utenti"]
+ *      tags: ["Utente"]
  *      parameters:
  *       - in: query
  *         name: Username
@@ -2374,7 +2468,7 @@ app.get("/api/checkNegozioPreferito", (req, res) => {
  * /api/salvaRecensione:
  *  post:
  *      description: Aggungi una nuova Recensione al sistema.
- *      tags: ["Recensioni"]
+ *      tags: ["Recensione"]
  *      parameters:
  *       - in: body
  *         name: Dati della Recensione
@@ -2405,6 +2499,8 @@ app.get("/api/checkNegozioPreferito", (req, res) => {
  *      responses:
  *          201:
  *              description: CREATED. Recensione creata correttamente e salvato.
+ *          400:
+ *              description: BAD REQUEST. Dati inseriti non validi.
  *          403:
  *              description: FORBIDDEN. Errore inviato nel caso in cui chi inviata la richiesta non è un Utente loggato (con username null).
  *          500:
@@ -2452,7 +2548,7 @@ app.post("/api/salvaRecensione", (req, res) => {
  * /api/eliminaRecensione:
  *  delete:
  *      description: Elimina una Recensione dal sistema.
- *      tags: ["Recensioni"]
+ *      tags: ["Recensione"]
  *      parameters:
  *       - in: query
  *         name: Usernarme
@@ -2465,6 +2561,8 @@ app.post("/api/salvaRecensione", (req, res) => {
  *      responses:
  *          204:
  *              description: NO CONTENT. Recensione eliminata correttamente e nessun ritorno dall'API.
+ *          303:
+ *              description: SEE OTHER. Reindirizza l'utente ad un'altra pagina.
  *          400:
  *              description: BAD REQUEST. Errore nel caso in cui i dati non siano validi.
  *          403:
@@ -2516,7 +2614,7 @@ app.delete("/api/eliminaRecensione", (req, res) => {
  * /api/trovaRecensioniFiltroUtente:
  *  get:
  *      description: Ottiene tutte le Recensione salvati nel sistema effettuate da un Utente specifico.
- *      tags: ["Recensioni"]
+ *      tags: ["Recensione"]
  *      parameters:
  *       - in: query
  *         name: Username
@@ -2549,7 +2647,7 @@ app.get("/api/trovaRecensioniFiltroUtente", (req, res) => {
  * /api/trovaRecensioniFiltroNegozio:
  *  get:
  *      description: Ottiene tutte le Recensione salvati nel sistema riferite ad un determinato Negozio.
- *      tags: ["Recensioni"]
+ *      tags: ["Recensione"]
  *      parameters:
  *       - in: query
  *         name: Negozio
@@ -2581,7 +2679,7 @@ app.get("/api/trovaRecensioniFiltroNegozio", (req, res) => {
  * /api/trovaTutteRecensioni:
  *  get:
  *      description: Ottiene tutte le Recensione salvati nel sistema.
- *      tags: ["Recensioni"]
+ *      tags: ["Recensione"]
  *      responses:
  *          200:
  *              description: OK. Si ottengono correttamente tutte le Recensioni presenti nel sistema.
@@ -2647,7 +2745,7 @@ app.get("/api/inviaMail", (req, res) => {
  * /api/categorie:
  *  get:
  *      description: Usata per ottenere tutte le Categorie.
- *      tags: ["Categorie"]
+ *      tags: ["Categoria"]
  *      responses:
  *          200:
  *              description: OK. Ottiene tutte le Categorie.
