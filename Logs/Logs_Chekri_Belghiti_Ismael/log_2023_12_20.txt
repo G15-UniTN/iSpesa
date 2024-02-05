@@ -1,0 +1,3 @@
+Orario di lavoro:20:00/23:00
+-Dopo aver discusso con i miei colleghi abbiamo deciso di apportare delle modifica al database
+ quindi ho iniziato a ridefinire il database
