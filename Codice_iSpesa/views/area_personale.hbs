@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>iSpesa Area Personale</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <style>
+        .font-1{
+            color: whitesmoke;
+        }
+
+        a{
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        ul.nav a:hover{
+            color:goldenrod;
+        }
+
+        .font-2{
+          text-shadow: 0px 0px 6px black;
+        }
+
+        .font-3{
+          color:black;
+        }
+
+        .font-sconto{
+          color:red;
+          text-decoration: line-through;
+          text-align: center;
+        }
+
+        .font-prezzo_nuovo{
+          color: black;
+          text-align: center;
+        }
+
+        .font-nome_prodotto{
+          color: black;
+          overflow: hidden;
+          display: -webkit-box;
+          -webkit-line-clamp: 2; /* number of lines to show */
+                  line-clamp: 2; 
+          -webkit-box-orient: vertical;
+          text-align: center;
+        }
+
+        .font-link{
+            color:blue;
+            word-wrap: break-word;
+            display:inline-block;
+        }
+
+        .ritratti-ombra{
+          box-shadow: 5px 5px 10px;
+        }
+
+        .card-title{
+          text-overflow: ellipsis;
+          display:-webkit-box;
+          overflow: hidden;
+          width:100%;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+        }
+    </style>
+</head>
+  <body onload="caricaDati()">{{> (lookup . 'header')}}
+    <div class="container bootstrap snippets bootdey mt-3">
+        <h1>Modifica il Profilo</h1>
+        <hr>
+        <div class="row">
+        <div class="col-md-3">
+            <div class="text-center">
+            <img src="/img/sito/pfp.jpg" class="avatar img-circle img-thumbnail" alt="avatar" style="width:200px; height:200px;">
+            <h6>Inserisci un'altra foto...</h6>
+            
+            <input type="file" class="form-control">
+            </div><hr>
+            <h4 style="text-align:center">Invia una segnalazione</h4>
+            <form action="/api/inviaMail" method="GET">
+                <div class="form-group">
+                    <label for="testoSegnalazione">Testo segnalazione</label>
+                    <textarea class="form-control" id="testoSegnalazione" placeholder="Testo segnalazione"></textarea>
+                </div><br>
+                <button type="submit" class="btn btn-primary">Invia</button>
+            </form>    
+        </div>
+        <div class="col-md-9 personal-info">
+            <h3>Informazioni personali</h3>
+            <label class="col-lg-3 control-label">Nome utente:</label>
+            <div class="input-group mt-2">
+                <div class="col-lg-8">
+                    <input class="form-control" type="text" id="Username" readonly>
+                </div>
+            </div>
+            <form action="/api/modificaEmail?_method=PATCH" method="POST" class="mt-2">
+                <label class="col-lg-3 control-label">Email:</label>
+                <div class="input-group mt-2">
+                    <div class="col-lg-8">
+                        <input class="form-control" type="email" id="Email" name="Email" value="">
+                    </div>
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="submit">Modifica</button>
+                    </div>
+                    <input type="hidden" name="Username" value="{{ user }}">
+                </div>
+            </form>
+            <form action="/api/modificaNumeroTelefono?_method=PATCH" method="POST" class="mt-2">
+                <label class="col-lg-3 control-label">Numero di telefono:</label>
+                <div class="input-group mt-2">
+                    <div class="col-lg-8">
+                        <input class="form-control" type="number" id="Telefono" name="Telefono" value="">
+                    </div>
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="submit">Modifica</button>
+                    </div>
+                    <input type="hidden" name="Username" value="{{ user }}">
+                </div>
+            </form>
+            <hr>
+            <div class="row">
+                <div class="col-7">
+                    <h4>Cambia password</h4>
+                    <form action="/api/modificaPassword?_method=PATCH" method="POST" class="mt-2">
+                        <label class="col-lg-3 control-label">Vecchia password:</label>
+                        <div class="input-group mt-2">
+                            <div class="col-lg-8">
+                                <input class="form-control" type="password" name="PasswordVecchia" value="">
+                            </div>
+                        </div>
+                        <label class="col-lg-3 control-label mt-2">Nuova password:</label>
+                        <div class="input-group mt-2">
+                            <div class="col-lg-8">
+                                <input class="form-control" type="password" name="Password" value="">
+                            </div>
+                        </div>
+                        <input type="hidden" name="Username" value="{{ user }}">
+                        <button type="submit" class="btn btn-primary mt-2">Invia</button>
+                    </form>
+                </div>
+                <div class="col-4">
+                    <h4>Attiva 2AF</h4>
+                    <form action="/api/attiva2AF?_method=PATCH" method="POST">
+                        <input type="hidden" name="Username" value="{{ user }}">
+                        <button type="submit" class="btn btn-primary mt-2">Attiva 2AF</button>
+                    </form>
+                </div>
+            </div>
+            {{> (lookup . 'admin')}}
+        </div>
+    </div>
+    </div>
+    <hr>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script>
+        const url_sito = "http://localhost:8080";
+
+        function caricaDati(){
+            caricaDatiUtente();
+        }
+
+        function caricaDatiUtente(){
+            Username = "{{ user }}";
+            if(Username != null && Username != ""){
+                var request = "/api/ottieniDatiUtente?Username=" + Username;
+                fetch(url_sito + request)
+                .then(response => response.json())
+                .then(data => {
+                    var FotoProfilo = data[0].FotoProfilo;
+                    var Email = data[0].Email;
+                    var Telefono = data[0].Telefono;
+                    document.getElementById("Username").value = Username;
+                    document.getElementById("Email").value = Email;
+                    document.getElementById("Telefono").value = Telefono;
+                })
+            }
+        }
+    </script>
+  </body>
+</html>

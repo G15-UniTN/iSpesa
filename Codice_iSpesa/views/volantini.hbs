@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>iSpesa Volantini</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <style>
+        .font-1{
+            color: whitesmoke;
+        }
+
+        a{
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        ul.nav a:hover{
+            color:goldenrod;
+        }
+
+        .font-2{
+          text-shadow: 0px 0px 6px black;
+        }
+
+        .font-3{
+          color:black;
+        }
+
+        .font-sconto{
+          color:red;
+          text-decoration: line-through;
+          text-align: center;
+        }
+
+        .font-prezzo_nuovo{
+          color: black;
+          text-align: center;
+        }
+
+        .font-nome_prodotto{
+          color: black;
+          overflow: hidden;
+          display: -webkit-box;
+          -webkit-line-clamp: 2; /* number of lines to show */
+                  line-clamp: 2; 
+          -webkit-box-orient: vertical;
+          text-align: center;
+        }
+
+        .font-link{
+            color:blue;
+            word-wrap: break-word;
+            display:inline-block;
+        }
+
+        .ritratti-ombra{
+          box-shadow: 5px 5px 10px;
+        }
+
+        .card-title{
+          text-overflow: ellipsis;
+          display:-webkit-box;
+          overflow: hidden;
+          width:100%;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+        }
+    </style>
+</head>
+  <body onload="caricaDati()">{{> (lookup . 'header')}}
+    <nav class="navbar navbar-expand-lg navbar-light bg-dark-subtle">
+      <div class="container-fluid">
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav nav-tabs me-auto px-2" id="navbar-negozi">
+            <li class="nav-item px-2" onclick="caricaVolantini();isActive('Tutti')" style="cursor: pointer">
+              <a class="nav-link active nav-link-negozi" id="Tutti">Tutti</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div class="container p-0">
+      <div class="row" id="listaVolantini">
+        <div class="col-2 p-3">
+            <div class="card bg-secondary-subtle shadow">
+                <img src="/img/logo/conad.png" class="card-img-top p-3" alt="Logo del negozio">
+                <div class="card-body pt-0 pb-1">
+                    <h5 class="card-title">
+                        INSERIRE NOME DEL NEGOZIO AAAAAAAAAAAAA
+                    </h5>
+                    <div class="row d-flex justify-content-around">
+                        <div class="col">
+                            <a href="#" class="font-link">Apri</a>
+                        </div>
+                        <div class="col">
+                            <a href="#" class="font-link">Scarica</a>
+                        </div>
+                    </div>
+                    <p class="card-text"><small class="text-muted">Scade il *data*</small></p>
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script>
+      const url_sito = "http://localhost:8080";
+
+      function caricaDati(){
+        caricaNegozi();
+        caricaVolantini();
+      }
+
+      function caricaNegozi(){
+        fetch(url_sito + "/api/trovaTuttiNegozi")
+        .then(response => response.json())
+        .then(data => {
+          data.forEach(row => {
+            Nome = row.Nome;
+            ID = row.IDNegozio;
+            var funzione = "mostraNegozio('" + ID + "')";
+            var funzione2 = "isActive('" + ID + "')";
+            var funzioni = funzione + ";" + funzione2;
+            var li = document.createElement("li");
+            let a = document.createElement("a");
+            li.classList.add("nav-item");
+            li.classList.add("px-2");
+            li.setAttribute('style', "cursor: pointer");
+            a.classList.add("nav-link");
+            a.classList.add("nav-link-negozi");
+            a.id = ID;
+            li.setAttribute('onclick', funzioni);
+            a.innerHTML = Nome.replaceAll("_", " ");
+            li.appendChild(a);
+            document.getElementById("navbar-negozi").appendChild(li);
+          })
+        })
+      }
+
+      
+      function caricaVolantini(){
+        var volantini_trovati = [];
+        document.getElementById("listaVolantini").innerHTML = "";
+        fetch(url_sito + "/api/trovaTuttiVolantini")
+        .then(response => response.json())
+        .then(data => {
+          var i = 0;
+          while(i < 18 && i < data.length){
+            var Negozio = data[i].Negozio;
+            var Scadenza = data[i].DataFine;
+            var File = data[i].VolantinoFile;
+            var Logo = data[i].Logo; // cambia in .Logo
+            var IDVolantino = data[i].IDVolantino;
+            volantini_trovati.push(IDVolantino);
+            let c1 = document.createElement("div");
+            c1.classList.add("col-2", "p-3");
+            let c2 = document.createElement("div");
+            c2.classList.add("card", "bg-secondary-subtle", "shadow");
+            let c3 = document.createElement("img");
+            c3.src = Logo;
+            c3.classList.add("card-img-top", "p-3");
+            let c4 = document.createElement("div");
+            c4.classList.add("card-body", "pt-0", "pb-1");
+            let c5 = document.createElement("h5");
+            c5.classList.add("card-title");
+            c5.innerHTML = Negozio;
+            let c6 = document.createElement("div");
+            c6.classList.add("row", "d-flex", "justify-content-around");
+            let c7 = document.createElement("div");
+            c7.classList.add("col");
+            let c8 = document.createElement("a");
+            c8.href = File;
+            c8.innerHTML = "Apri";
+            c8.classList.add("font-link");
+            let c9 = document.createElement("div");
+            c9.classList.add("col");
+            let c10 = document.createElement("a");
+            c10.href = File;
+            c10.innerHTML = "Scarica";
+            c10.classList.add("font-link");
+            let c11 = document.createElement("p");
+            c11.classList.add("card-text");
+            let c12 = document.createElement("small");
+            c12.classList.add("text-muted");
+            c12.innerHTML = "Scade il " + Scadenza.substring(0,10);
+            c1.appendChild(c2);
+            c2.appendChild(c3);
+            c2.appendChild(c4);
+            c4.appendChild(c5);
+            c4.appendChild(c6);
+            c4.appendChild(c11);
+            c11.appendChild(c12);
+            c6.appendChild(c7);
+            c7.appendChild(c8);
+            c6.appendChild(c9);
+            c9.appendChild(c10);
+            document.getElementById("listaVolantini").appendChild(c1);
+            i++;
+          }
+        })
+      }
+
+      function mostraNegozio(negozio){
+        const request = "/api/trovaVolantiniFiltroNegozio?IDNegozio=" + negozio;
+        
+        document.getElementById("listaVolantini").innerHTML = "";
+        var sconti_trovati = [];
+        fetch((url_sito + request))
+        .then(response => response.json())
+        .then(data => {
+          var i = 0;
+          while(i < 18 && i < data.length){
+            var Negozio = data[i].Negozio;
+            var Scadenza = data[i].DataFine;
+            var File = data[i].VolantinoFile;
+            var Logo = data[i].Logo; // cambia in .Logo
+            var IDVolantino = data[i].IDVolantino;
+            let c1 = document.createElement("div");
+            c1.classList.add("col-2", "p-3");
+            let c2 = document.createElement("div");
+            c2.classList.add("card", "bg-secondary-subtle", "shadow");
+            let c3 = document.createElement("img");
+            c3.src = Logo;
+            c3.classList.add("card-img-top", "p-3");
+            let c4 = document.createElement("div");
+            c4.classList.add("card-body", "pt-0", "pb-1");
+            let c5 = document.createElement("h5");
+            c5.classList.add("card-title");
+            c5.innerHTML = Negozio;
+            let c6 = document.createElement("div");
+            c6.classList.add("row", "d-flex", "justify-content-around");
+            let c7 = document.createElement("div");
+            c7.classList.add("col");
+            let c8 = document.createElement("a");
+            c8.href = File;
+            c8.innerHTML = "Apri";
+            c8.classList.add("font-link");
+            let c9 = document.createElement("div");
+            c9.classList.add("col");
+            let c10 = document.createElement("a");
+            c10.href = File;
+            c10.innerHTML = "Scarica";
+            c10.classList.add("font-link");
+            let c11 = document.createElement("p");
+            c11.classList.add("card-text");
+            let c12 = document.createElement("small");
+            c12.classList.add("text-muted");
+            c12.innerHTML = "Scade il " + Scadenza.substring(0,10);
+            c1.appendChild(c2);
+            c2.appendChild(c3);
+            c2.appendChild(c4);
+            c4.appendChild(c5);
+            c4.appendChild(c6);
+            c4.appendChild(c11);
+            c11.appendChild(c12);
+            c6.appendChild(c7);
+            c7.appendChild(c8);
+            c6.appendChild(c9);
+            c9.appendChild(c10);
+            document.getElementById("listaVolantini").appendChild(c1);
+            i++;
+          }
+        })
+      }
+
+      function isActive(negozio){
+        let nav_negozi = document.getElementsByClassName("nav-link-negozi");
+        for(var i = 0; i < nav_negozi.length; i++){
+          if(nav_negozi[i].id != negozio){
+            nav_negozi[i].classList.remove("active");
+          }
+          else{
+            nav_negozi[i].classList.add("active");
+          }
+        }
+      }
+    </script>
+  </body>
+</html>
