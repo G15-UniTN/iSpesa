@@ -1,2 +1,0 @@
-Orario di lavoro:9:00/11:00
--popolamento database e rifinitura nelle definizioni del db

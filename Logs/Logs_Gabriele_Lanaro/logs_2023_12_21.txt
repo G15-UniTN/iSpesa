@@ -1,2 +1,0 @@
-10:00-16:00
-- Lavorato sul back-end e front-end con Node.js

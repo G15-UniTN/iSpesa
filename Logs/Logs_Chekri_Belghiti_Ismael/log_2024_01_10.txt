@@ -1,3 +1,0 @@
-Orario di lavoro:10:00/13:00
--dopo aver parlato con Lanaro abbiamo deciso di modificare alcune chiavi primarie ed esterne
- e ho iniziato a rimodellarlo

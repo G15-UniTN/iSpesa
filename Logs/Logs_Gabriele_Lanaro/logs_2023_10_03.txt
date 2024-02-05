@@ -1,4 +1,0 @@
-16:50-19:00
-- Lavorato sul front-end del progetto
-- Finito il mock-up della home-page
-- Finito il mock-up della pagina del prodotto

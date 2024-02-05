@@ -1,3 +1,0 @@
-Orario di lavoro:15:00/17:30
--Conclusione relazioni e rifinitura dei vincoli del database
--Popolamento casuale del database per testare la WEB-app
