@@ -69,7 +69,7 @@ app.set("view engine", "hbs");
 app.set("views", path.join(__dirname, "views"));
 hbs.registerPartials(__dirname + "/views/partials");
 
-var con = mysql.createConnection({
+var con = mysql.createConnection({ // Per connettersi in locale, creare un database usando lo schema contenuto in ./Database/iSpesa_DB.sql e cambiare le credenziali in seguito.
     host: "10.18.241.198",
     user: "admin",
     password: "iSpesaPassword",
