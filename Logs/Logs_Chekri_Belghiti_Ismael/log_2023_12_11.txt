@@ -1,2 +1,0 @@
-Orario di lavoro: 20:00/22:00
-Inizio creazione delle relazioni nei database iSpesa e del Database di prova

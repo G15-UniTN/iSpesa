@@ -1,2 +1,0 @@
-Orario di lavoro:16.30-19.30
-Progettazione del back end della nostra web app in base all'analisi fatta precedentemente.

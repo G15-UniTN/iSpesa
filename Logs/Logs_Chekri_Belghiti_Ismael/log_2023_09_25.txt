@@ -1,5 +1,0 @@
-orario di lavoro:11.30/13.30
--Creazione dell'organizzazione su Github
--Idealizzazione del progetto
--Discussione degli obiettivi e requisiti del progetto
--Stesura del documento di analisi dei requisiti
