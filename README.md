@@ -13,7 +13,7 @@ I parametri per la connessione al server MariaDB sono specificati nel file **mai
 
 Per connettersi in locale bisogna creare un database usando lo script contenuto in **/Database/iSpesa_DB.sql**.
 
-Versione di MariaDB usata: 10.5
+Versione di MariaDB usata: **10.5**
 
 
 ## Note per la documentazione
