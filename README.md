@@ -18,4 +18,4 @@ Versione di MariaDB usata: **10.5**
 
 ## Note per la documentazione
 
-La documentazione delle API è disponibile in **[URL sito]/api-docs/'**.
+La documentazione delle API è disponibile in **[URL sito]/api-docs/**.
